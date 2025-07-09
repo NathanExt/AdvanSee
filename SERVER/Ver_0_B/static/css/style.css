@@ -1,0 +1,29 @@
+/* static/css/style.css */
+body {
+    padding-top: 56px;
+    background-color: #343a40; /* Um cinza escuro, como o do navbar do Bootstrap */
+    color: #ffffff; /* Texto branco */
+}
+.footer {
+    padding: 20px;
+    text-align: center;
+    margin-top: 500px;
+    background-color: #212529; /* Rodapé ainda mais escuro */
+    border-top: 1px solid #495057;
+}
+
+/* Ajustar cores de texto para elementos específicos do Bootstrap */
+/* Os cards têm um fundo branco por padrão no Bootstrap, então o texto neles não deve ser branco */
+.card {
+    background-color: #525252; /* Certifique-se de que o fundo do card é branco */
+    color: #ffffff; /* Cor do texto dentro do card para um cinza muito escuro/quase preto */
+}
+/* As tabelas usam fundo claro, ajuste o texto */
+.table th, .table td {
+    color: #ffffff;
+    /*color: #212529; /* Texto da tabela para cinza escuro/quase preto */
+}
+/* As barras de navegação (navbar) já têm texto branco com fundo escuro, não precisam de alteração */
+.navbar {
+    background-color: #212529 !important; /* Exemplo de fundo escuro para a navbar, se quiser ser consistente */
+}

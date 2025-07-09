@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Assets</h1>
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Asset Tag</th>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Marca</th>
+                <th>Location</th>
+                <th>Assigned User</th>
+                <th>Status</th>
+                <th>Criticality</th>
+                <th>Purchase Date</th>
+                <th>Purchase Cost</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr>
+                <td>{{ asset.id }}</td>
+                <td>{{ asset.asset_tag }}</td>
+                <td>{{ asset.name }}</td>
+                <td>{{ asset.category.name if asset.category else 'N/A' }}</td>
+                <td>{{ asset.vendor.name if asset.vendor else 'N/A' }}</td>
+                <td>{{ asset.location.name if asset.location else 'N/A' }}</td>
+                <td>{{ asset.assigned_user.username if asset.assigned_user else 'N/A' }}</td>
+                <td>{{ asset.status }}</td>
+                <td>{{ asset.criticality }}</td>
+                <td>{{ asset.purchase_date if asset.purchase_date else 'N/A' }}</td>
+                <td>{{ "${:,.2f}".format(asset.purchase_cost) if asset.purchase_cost else 'N/A' }}</td>
+                <td><a href="{{ url_for('asset_detail.asset_detail', asset_id=asset.id) }}" class="btn btn-sm btn-info">View Details</a></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="12">No assets found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

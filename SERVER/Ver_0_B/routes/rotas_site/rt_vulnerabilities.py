@@ -8,3 +8,4 @@ def vulnerabilities():
     vulnerabilities_list = Vulnerability.query.all()
     return render_template('vulnerabilities.html', vulnerabilities_list=vulnerabilities_list)
 
+

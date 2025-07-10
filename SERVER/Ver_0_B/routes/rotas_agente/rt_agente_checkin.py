@@ -9,6 +9,7 @@ bp_agente_checkin = Blueprint('checkin', __name__)
 ENCRYPTION_KEY_BYTES = CONFIG.ENCRYPTION_KEY
 CIPHER_SUITE = Fernet(ENCRYPTION_KEY_BYTES)
 
+
 @bp_agente_checkin.route('/checkin', methods=['POST'])
 def agent_checkin():
     try:

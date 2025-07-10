@@ -14,6 +14,7 @@ def notebook():
             print("Resposta não é uma lista:", type(dados))
             return []
 
+
     except requests.exceptions.RequestException as e:
         print(f"Erro na requisição: {e}")
         return []

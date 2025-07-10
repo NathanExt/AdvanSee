@@ -7,3 +7,4 @@ bp_locations = Blueprint('locations', __name__)
 def locations():
     locations = Location.query.all()
     return render_template('locations.html', locations=locations)
+

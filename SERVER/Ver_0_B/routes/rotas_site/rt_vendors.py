@@ -7,3 +7,4 @@ bp_vendors = Blueprint('vendors', __name__)
 def vendors():
     vendors = Vendor.query.all()
     return render_template('vendors.html', vendors=vendors)
+

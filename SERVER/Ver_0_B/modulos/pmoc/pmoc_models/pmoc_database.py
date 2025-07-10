@@ -4,6 +4,7 @@ class Notebook(db.Model):
     __bind_key__ = 'pmoc'
     __tablename__ = 'notebook'
 
+
     id = db.Column(db.String(255), primary_key=True)
     model = db.Column(db.Text)
     patrimony = db.Column(db.String(255))

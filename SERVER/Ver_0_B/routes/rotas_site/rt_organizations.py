@@ -7,3 +7,4 @@ bp_organizations = Blueprint('organizations', __name__)
 def organizations():
     organizations = Organization.query.all()
     return render_template('organizations.html', organizations=organizations)
+

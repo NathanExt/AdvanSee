@@ -7,3 +7,4 @@ bp_asset_categories = Blueprint('asset_categories', __name__)
 def asset_categories():
     categories = AssetCategory.query.all()
     return render_template('asset_categories.html', categories=categories)
+

@@ -1,6 +1,7 @@
 -- Script para criar a tabela desktop no banco de dados DB_PMOC
 -- Execute este script no PostgreSQL para criar a tabela
 
+
 -- Verificar se a tabela já existe
 DO $$
 BEGIN

@@ -7,3 +7,4 @@ bp_software = Blueprint('software', __name__)
 def software():
     software_list = Software.query.all()
     return render_template('software.html', software_list=software_list)
+

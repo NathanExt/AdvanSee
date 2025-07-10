@@ -17,6 +17,7 @@ class PMOC:
         except Exception as e:
             print("ERRO CONECTAR BANCO:", e)
 
+
     def criar_notebook(self, data):
         try:
             equipment_value = data.get("equipmentValue", "R$0,00")

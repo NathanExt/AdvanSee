@@ -13,3 +13,4 @@ def assets():
     ).all()
     return render_template('assets.html', assets=assets)
 
+

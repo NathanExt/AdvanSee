@@ -18,6 +18,7 @@ def dados_asset(asset_id):
     asset_patches = AssetPatch.query.filter_by(asset_id=asset.id).options(db.joinedload(AssetPatch.patch)).all()
     asset_history = AssetHistory.query.filter_by(asset_id=asset.id).order_by(AssetHistory.timestamp.desc()).all()
     
+    
     agent = Agent.query.filter_by(asset_id=asset.id).first()
 
     # Extrair dados do JSONB de agent.configuration se o agente existir

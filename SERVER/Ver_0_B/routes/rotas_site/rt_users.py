@@ -17,6 +17,7 @@ def dados():
 
 
 
+
 @bp_users.route('/users')
 def users():
     users,_,_ = dados()

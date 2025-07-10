@@ -7,11 +7,11 @@ bp_pmoc = Blueprint('pmoc', __name__)
 @bp_pmoc.route('/pmoc')
 def pmoc():
     try:
-        # Buscar notebooks e desktops do banco PMOC
         notebooks = Notebook.query.all()
         desktops = Desktop.query.all()
         
-        # Combinar os dados para exibição
+        
+        
         pmoc_assets = []
         
         # Adicionar notebooks

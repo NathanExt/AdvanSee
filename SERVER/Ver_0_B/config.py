@@ -18,13 +18,14 @@ class CONFIG:
     DB_PORT = "5432"
     
     # Banco principal - ISAC
-    DB_NAME_DEFAULT = "ISAC_BD_ADVANSEE_2"
+    DB_NAME_DEFAULT = "DB_ASSETS"
     DATABASE_URL_DEFAULT = (
         f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME_DEFAULT}"
     )
     
+    
     # Banco PMOC
-    DB_NAME_PMOC = "BD_PMOC"
+    DB_NAME_PMOC = "DB_PMOC"
     DATABASE_URL_PMOC = (
         f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME_PMOC}"
     )

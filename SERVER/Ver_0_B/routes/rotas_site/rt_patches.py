@@ -7,3 +7,4 @@ bp_patches = Blueprint('patches', __name__)
 def patches():
     patches_list = Patch.query.all()
     return render_template('patches.html', patches_list=patches_list)
+

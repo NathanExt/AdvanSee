@@ -37,12 +37,6 @@ app.register_blueprint(rt_users.bp_users)
 app.register_blueprint(rt_assets.bp_assets)
 app.register_blueprint(rt_pmoc.bp_pmoc)
 
-def create_tables():
-    """Criar tabelas em ambos os bancos de dados"""
-    with app.app_context():
-        # Criar tabelas do banco principal e PMOC (usando binds)
-        db.create_all()
-
 @app.route('/')
 def index():
     organization_count = Organization.query.count()
@@ -63,5 +57,4 @@ def index():
                            chart_values=chart_values)
 
 if __name__ == '__main__':
-    create_tables()
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0',port=5000)

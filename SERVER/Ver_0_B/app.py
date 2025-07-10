@@ -1,3 +1,4 @@
+
 import os, logging, sys
 from flask import Flask, render_template, url_for, flash, redirect, request
 from models.database import db, Organization, User, Asset, Vulnerability
@@ -59,3 +60,6 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0',port=5000)
+
+
+#VER_0_B

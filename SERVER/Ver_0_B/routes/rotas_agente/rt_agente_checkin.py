@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, request, json, jsonify
 from models.database import db, Asset, Agent, Organization, AssetHistory, InstalledSoftware, NetworkInterface, WindowsUpdate
 from datetime import datetime
-from config import Config
+from config import CONFIG
 from cryptography.fernet import Fernet
 
 bp_agente_checkin = Blueprint('checkin', __name__)
 
-ENCRYPTION_KEY_BYTES = Config.ENCRYPTION_KEY
+ENCRYPTION_KEY_BYTES = CONFIG.ENCRYPTION_KEY
 CIPHER_SUITE = Fernet(ENCRYPTION_KEY_BYTES)
 
 @bp_agente_checkin.route('/checkin', methods=['POST'])
@@ -73,6 +73,9 @@ def agent_checkin():
                 disk_model=disk_info.get('model'),
                 disk_serial=disk_info.get('serial'),
                 disk_interface_type=disk_info.get('interface_type'),
+                computer_model=system_info.get('computer_model'),
+                computer_manufacturer=system_info.get('computer_manufacturer'),
+                computer_system_type=system_info.get('computer_system_type'),
                 last_seen=datetime.utcnow(),
                 created_at=datetime.utcnow()
             )
@@ -129,6 +132,9 @@ def agent_checkin():
                 'cpu_freq_current': system_info.get('cpu_freq_current'),
                 'cpu_freq_min': system_info.get('cpu_freq_min'),
                 'cpu_freq_max': system_info.get('cpu_freq_max'),
+                'computer_model': system_info.get('computer_model'),
+                'computer_manufacturer': system_info.get('computer_manufacturer'),
+                'computer_system_type': system_info.get('computer_system_type'),
             }
 
             memory_info = system_info.get('memory_info', {})

@@ -159,9 +159,81 @@ class AGENTE:
                 'memory_percent': memory.percent,
             }
 
-            return {**cpu_info, **memory_info}
+            # Obter informações do modelo e fabricante do equipamento
+            computer_info = self.get_computer_model_info()
+
+            return {**cpu_info, **memory_info, **computer_info}
         except Exception as e:
             logging.error(f"Erro ao coletar informações de hardware: {e}")
+            return {}
+
+    def get_computer_model_info(self):
+        """Obtém informações do modelo e fabricante do computador"""
+        try:
+            computer_info = {}
+            
+            if platform.system() == 'Windows':
+                # Usar WMI para obter informações do sistema
+                c = wmi.WMI()
+                
+                # Informações do sistema
+                for system in c.Win32_ComputerSystem():
+                    computer_info['computer_model'] = system.Model.strip() if system.Model else None
+                    computer_info['computer_manufacturer'] = system.Manufacturer.strip() if system.Manufacturer else None
+                    computer_info['computer_system_type'] = system.SystemType.strip() if system.SystemType else None
+                    break
+                
+                # Informações adicionais da placa-mãe
+                for board in c.Win32_BaseBoard():
+                    if board.Manufacturer and not computer_info.get('computer_manufacturer'):
+                        computer_info['computer_manufacturer'] = board.Manufacturer.strip()
+                    if board.Product and not computer_info.get('computer_model'):
+                        computer_info['computer_model'] = board.Product.strip()
+                    break
+                
+                # Informações do BIOS
+                for bios in c.Win32_BIOS():
+                    if bios.Manufacturer and not computer_info.get('computer_manufacturer'):
+                        computer_info['computer_manufacturer'] = bios.Manufacturer.strip()
+                    break
+                    
+            elif platform.system() == 'Linux':
+                # Para Linux, tentar ler informações do DMI
+                try:
+                    with open('/sys/class/dmi/id/sys_vendor', 'r') as f:
+                        computer_info['computer_manufacturer'] = f.read().strip()
+                except FileNotFoundError:
+                    pass
+                
+                try:
+                    with open('/sys/class/dmi/id/product_name', 'r') as f:
+                        computer_info['computer_model'] = f.read().strip()
+                except FileNotFoundError:
+                    pass
+                    
+            elif platform.system() == 'Darwin':  # macOS
+                try:
+                    # Usar system_profiler para obter informações do hardware
+                    cmd = ['system_profiler', 'SPHardwareDataType']
+                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10, creationflags=CREATE_NO_WINDOW)
+                    
+                    if result.returncode == 0:
+                        output = result.stdout
+                        for line in output.split('\n'):
+                            if 'Model Name:' in line:
+                                computer_info['computer_model'] = line.split(':', 1)[1].strip()
+                            elif 'Model Identifier:' in line:
+                                if not computer_info.get('computer_model'):
+                                    computer_info['computer_model'] = line.split(':', 1)[1].strip()
+                            elif 'Manufacturer:' in line:
+                                computer_info['computer_manufacturer'] = line.split(':', 1)[1].strip()
+                except Exception as e:
+                    logging.warning(f"Erro ao obter informações do hardware no macOS: {e}")
+            
+            return computer_info
+            
+        except Exception as e:
+            logging.error(f"Erro ao obter informações do modelo do computador: {e}")
             return {}
 
     def get_installed_software(self):
@@ -468,137 +540,6 @@ class ADVANSEE:
             print("Erro ao atualizar GPO:")
             print(e.stderr)
 
-    def check_windows_updates_available(self):
-        """Verifica atualizações disponíveis do Windows"""
-        try:
-            # Usa PowerShell para verificar atualizações disponíveis
-            cmd = '''
-            $UpdateSession = New-Object -ComObject Microsoft.Update.Session
-            $UpdateSearcher = $UpdateSession.CreateUpdateSearcher()
-            $SearchResult = $UpdateSearcher.Search("IsInstalled=0 and Type='Software'")
-            $Updates = $SearchResult.Updates | Select-Object Title, KB, Categories, Size, Description | ConvertTo-Json
-            $Updates
-            '''
-            
-            result = subprocess.run(['powershell', '-Command', cmd],
-                                  capture_output=True, text=True, timeout=60, creationflags=CREATE_NO_WINDOW)
-            
-            if result.returncode == 0 and result.stdout.strip():
-                updates = json.loads(result.stdout)
-                if isinstance(updates, list):
-                    return {"status": "success", "updates": updates, "count": len(updates)}
-                elif isinstance(updates, dict):
-                    return {"status": "success", "updates": [updates], "count": 1}
-                else:
-                    return {"status": "success", "updates": [], "count": 0}
-            else:
-                return {"status": "error", "message": "Nenhuma atualização encontrada ou erro na busca"}
-                
-        except subprocess.TimeoutExpired:
-            return {"status": "error", "message": "Timeout ao verificar atualizações"}
-        except Exception as e:
-            return {"status": "error", "message": f"Erro ao verificar atualizações: {str(e)}"}
-
-    def install_specific_kb(self, kb_number):
-        """Instala uma atualização específica por número KB"""
-        try:
-            # Remove 'KB' do número se fornecido
-            kb_clean = kb_number.replace('KB', '').replace('kb', '')
-            
-            # Comando PowerShell para instalar KB específico
-            cmd = f'''
-            $UpdateSession = New-Object -ComObject Microsoft.Update.Session
-            $UpdateSearcher = $UpdateSession.CreateUpdateSearcher()
-            $SearchResult = $UpdateSearcher.Search("IsInstalled=0 and Type='Software' and KBArticleIDs='{kb_clean}'")
-            
-            if ($SearchResult.Updates.Count -gt 0) {{
-                $UpdateCollection = New-Object -ComObject Microsoft.Update.UpdateCollection
-                $SearchResult.Updates | ForEach-Object {{ $UpdateCollection.Add($_) | Out-Null }}
-                
-                $Installer = $UpdateSession.CreateUpdateInstaller()
-                $Installer.Updates = $UpdateCollection
-                
-                $InstallationResult = $Installer.Install()
-                
-                $Result = @{{
-                    ResultCode = $InstallationResult.ResultCode
-                    HResult = $InstallationResult.HResult
-                    RebootRequired = $InstallationResult.RebootRequired
-                    UpdatesInstalled = $InstallationResult.Updates.Count
-                }}
-                
-                $Result | ConvertTo-Json
-            }} else {{
-                @{{ Error = "KB {kb_clean} não encontrado ou já instalado" }} | ConvertTo-Json
-            }}
-            '''
-            
-            result = subprocess.run(['powershell', '-Command', cmd],
-                                  capture_output=True, text=True, timeout=300, creationflags=CREATE_NO_WINDOW)
-            
-            if result.returncode == 0 and result.stdout.strip():
-                try:
-                    install_result = json.loads(result.stdout)
-                    return {"status": "success", "result": install_result}
-                except json.JSONDecodeError:
-                    return {"status": "success", "message": result.stdout}
-            else:
-                return {"status": "error", "message": f"Erro na instalação: {result.stderr}"}
-                
-        except subprocess.TimeoutExpired:
-            return {"status": "error", "message": "Timeout na instalação do KB"}
-        except Exception as e:
-            return {"status": "error", "message": f"Erro ao instalar KB {kb_number}: {str(e)}"}
-
-    def install_all_windows_updates(self):
-        """Instala todas as atualizações disponíveis do Windows"""
-        try:
-            # Comando PowerShell para instalar todas as atualizações
-            cmd = '''
-            $UpdateSession = New-Object -ComObject Microsoft.Update.Session
-            $UpdateSearcher = $UpdateSession.CreateUpdateSearcher()
-            $SearchResult = $UpdateSearcher.Search("IsInstalled=0 and Type='Software'")
-            
-            if ($SearchResult.Updates.Count -gt 0) {
-                $UpdateCollection = New-Object -ComObject Microsoft.Update.UpdateCollection
-                $SearchResult.Updates | ForEach-Object { $UpdateCollection.Add($_) | Out-Null }
-                
-                $Installer = $UpdateSession.CreateUpdateInstaller()
-                $Installer.Updates = $UpdateCollection
-                
-                $InstallationResult = $Installer.Install()
-                
-                $Result = @{
-                    ResultCode = $InstallationResult.ResultCode
-                    HResult = $InstallationResult.HResult
-                    RebootRequired = $InstallationResult.RebootRequired
-                    UpdatesInstalled = $InstallationResult.Updates.Count
-                    TotalUpdates = $SearchResult.Updates.Count
-                }
-                
-                $Result | ConvertTo-Json
-            } else {
-                @{ Message = "Nenhuma atualização disponível para instalação" } | ConvertTo-Json
-            }
-            '''
-            
-            result = subprocess.run(['powershell', '-Command', cmd],
-                                  capture_output=True, text=True, timeout=600, creationflags=CREATE_NO_WINDOW)
-            
-            if result.returncode == 0 and result.stdout.strip():
-                try:
-                    install_result = json.loads(result.stdout)
-                    return {"status": "success", "result": install_result}
-                except json.JSONDecodeError:
-                    return {"status": "success", "message": result.stdout}
-            else:
-                return {"status": "error", "message": f"Erro na instalação: {result.stderr}"}
-                
-        except subprocess.TimeoutExpired:
-            return {"status": "error", "message": "Timeout na instalação das atualizações"}
-        except Exception as e:
-            return {"status": "error", "message": f"Erro ao instalar atualizações: {str(e)}"}
-
     def force_reboot(self):
         """Força o reinício do sistema"""
         try:
@@ -625,7 +566,7 @@ class ADVANSEE:
             'system_info': system_info,
             'timestamp': datetime.now().isoformat()
         }
-        caminho_completo = os.path.join(CAMINHO_LOG_AGENTE, "log_pacote.txt")
+        caminho_completo = os.path.join(CAMINHO_LOG_AGENTE, "pacote.txt")
         with open(caminho_completo, 'w') as f:
             json.dump(pacote, f, indent=4)
 

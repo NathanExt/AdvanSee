@@ -1,7 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-import json
-
 db = SQLAlchemy()
 
 class Organization(db.Model):
@@ -113,6 +111,9 @@ class Asset(db.Model):
     disk_model = db.Column(db.String(255))
     disk_serial = db.Column(db.String(255))
     disk_interface_type = db.Column(db.String(50))
+    computer_model = db.Column(db.String(255))
+    computer_manufacturer = db.Column(db.String(255))
+    computer_system_type = db.Column(db.String(100))
 
     last_seen = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -98,6 +98,9 @@ CREATE TABLE assets (
     disk_model VARCHAR(255), -- New column
     disk_serial VARCHAR(255), -- New column
     disk_interface_type VARCHAR(50), -- New column
+    computer_model VARCHAR(255), -- New column for computer model
+    computer_manufacturer VARCHAR(255), -- New column for computer manufacturer
+    computer_system_type VARCHAR(100), -- New column for system type
     last_seen TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

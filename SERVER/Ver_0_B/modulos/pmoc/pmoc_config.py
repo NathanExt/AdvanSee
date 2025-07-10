@@ -1,11 +1,16 @@
+from config import CONFIG
+
 class CONFIG_PMOC:
-    DB_HOST = "172.16.0.17"
-    DB_NAME = "DB_PMOC"
-    DB_USER = "isac"
+    # Usar configurações da classe principal
+    DB_HOST = CONFIG.DB_HOST
+    DB_NAME = CONFIG.DB_NAME_PMOC
+    DB_USER = CONFIG.DB_USER
+    DB_PASSWORD = CONFIG.DB_PASSWORD
+    DB_PORT = CONFIG.DB_PORT
     EMAIL = "isac.admin@advansee.com.br"
-    DB_PASSWORD = "kwa44fgjc8suf91kjsacaz"
-    DB_PORT = "5432"
-    DATABASE_URL = (
-        f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    )
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # URL do banco PMOC
+    DATABASE_URL_PMOC = CONFIG.DATABASE_URL_PMOC
+    
+    # Configurações SQLAlchemy
+    SQLALCHEMY_TRACK_MODIFICATIONS = CONFIG.SQLALCHEMY_TRACK_MODIFICATIONS

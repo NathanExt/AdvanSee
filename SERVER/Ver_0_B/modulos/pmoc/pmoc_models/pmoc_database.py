@@ -1,31 +1,64 @@
-from sqlalchemy import Column, String, Date, Text, Numeric, TIMESTAMP
-from sqlalchemy.ext.declarative import declarative_base
+from models.database import db
 
-Base = declarative_base()
-
-class Notebook(Base):
+class Notebook(db.Model):
+    __bind_key__ = 'pmoc'
     __tablename__ = 'notebook'
 
-    id = Column(String, primary_key=True)
-    model = Column(Text)
-    patrimony = Column(String)
-    manufacturer = Column(Text)
-    equipment_value = Column(Numeric(10, 2))
-    tag_uisa = Column(String)
-    created_at = Column(Date)
-    updated_by = Column(String)
-    tag = Column(String)
-    os_version = Column(Text)
-    entry_note = Column(String)
-    status = Column(String)
-    date_home = Column(Date)
-    date_end = Column(Date)
-    updated_at = Column(TIMESTAMP)
-    rc = Column(String)
-    owner = Column(String)
-    processor = Column(Text)
-    type = Column(String)
-    ram_memory = Column(String)
-    last_inventory_date = Column(Date)
-    contract_type = Column(String)
-    os_architecture = Column(String)
+    id = db.Column(db.String(255), primary_key=True)
+    model = db.Column(db.Text)
+    patrimony = db.Column(db.String(255))
+    manufacturer = db.Column(db.Text)
+    equipment_value = db.Column(db.Numeric(10, 2))
+    tag_uisa = db.Column(db.String(255))
+    created_at = db.Column(db.Date)
+    updated_by = db.Column(db.String(255))
+    tag = db.Column(db.String(255))
+    os_version = db.Column(db.Text)
+    entry_note = db.Column(db.String(255))
+    status = db.Column(db.String(255))
+    date_home = db.Column(db.Date)
+    date_end = db.Column(db.Date)
+    updated_at = db.Column(db.DateTime)
+    rc = db.Column(db.String(255))
+    owner = db.Column(db.String(255))
+    processor = db.Column(db.Text)
+    type = db.Column(db.String(255))
+    ram_memory = db.Column(db.String(255))
+    last_inventory_date = db.Column(db.Date)
+    contract_type = db.Column(db.String(255))
+    os_architecture = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f'<Notebook {self.id}>'
+
+class Desktop(db.Model):
+    __bind_key__ = 'pmoc'
+    __tablename__ = 'desktop'
+
+    id = db.Column(db.String(255), primary_key=True)
+    model = db.Column(db.Text)
+    patrimony = db.Column(db.String(255))
+    manufacturer = db.Column(db.Text)
+    equipment_value = db.Column(db.Numeric(10, 2))
+    tag_uisa = db.Column(db.String(255))
+    created_at = db.Column(db.Date)
+    updated_by = db.Column(db.String(255))
+    tag = db.Column(db.String(255))
+    os_version = db.Column(db.Text)
+    entry_note = db.Column(db.String(255))
+    status = db.Column(db.String(255))
+    date_home = db.Column(db.Date)
+    date_end = db.Column(db.Date)
+    updated_at = db.Column(db.DateTime)
+    rc = db.Column(db.String(255))
+    owner = db.Column(db.String(255))
+    processor = db.Column(db.Text)
+    type = db.Column(db.String(255))
+    ram_memory = db.Column(db.String(255))
+    last_inventory_date = db.Column(db.Date)
+    contract_type = db.Column(db.String(255))
+    os_architecture = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f'<Desktop {self.id}>'
+

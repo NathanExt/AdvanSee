@@ -1,0 +1,95 @@
+# AdvanSee - Sistema de Gestão de Inventário Automatizado
+# Requirements para o servidor Flask e módulos relacionados
+
+# ===== FRAMEWORK WEB =====
+Flask==3.1.1
+Werkzeug==3.1.3
+
+# ===== BANCO DE DADOS =====
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.41
+psycopg2-binary==2.9.10
+
+# ===== CRIPTOGRAFIA =====
+cryptography==45.0.5
+Fernet==1.0.1
+
+# ===== REQUESTS HTTP =====
+requests==2.32.4
+urllib3==2.5.0
+
+# ===== PROCESSAMENTO DE DADOS =====
+# Para o agente (coleta de informações do sistema)
+psutil==6.1.0
+
+# ===== INTERFACE GRÁFICA (AGENTE) =====
+# Para o agente que roda no sistema do usuário
+Pillow==11.0.0
+pystray==0.19.5
+
+# ===== WINDOWS MANAGEMENT (AGENTE) =====
+# Apenas para Windows - coleta de informações do sistema
+wmi==1.5.1
+pywin32==306
+
+# ===== AGENDAMENTO (AGENTE) =====
+# Para agendamento de tarefas no agente
+schedule==1.2.1
+
+# ===== UTILITÁRIOS =====
+# Para formatação de texto e cores no terminal
+colorama==0.4.6
+
+# ===== VALIDAÇÃO E FORMATAÇÃO =====
+# Para validação de dados
+click==8.2.1
+
+# ===== TEMPLATES E FRONTEND =====
+# Para templates HTML (incluído com Flask)
+Jinja2==3.1.6
+MarkupSafe==3.0.2
+
+# ===== SEGURANÇA =====
+# Para sessões seguras
+itsdangerous==2.2.0
+
+# ===== DESENVOLVIMENTO =====
+# Para desenvolvimento (opcional)
+blinker==1.9.0
+
+# ===== COMPATIBILIDADE =====
+# Para compatibilidade com diferentes versões do Python
+typing-extensions==4.14.1
+
+# ===== CERTIFICADOS SSL =====
+# Para requisições HTTPS seguras
+certifi==2025.7.9
+
+# ===== CODIFICAÇÃO =====
+# Para detecção de codificação de caracteres
+charset-normalizer==3.4.2
+
+# ===== IDENTIFICAÇÃO =====
+# Para identificação de idiomas
+idna==3.10
+
+# ===== GREENLET =====
+# Para operações assíncronas no SQLAlchemy
+greenlet==3.2.3
+
+# ===== CFFI =====
+# Para criptografia
+cffi==1.17.1
+pycparser==2.22
+
+# ===== SETUPTOOLS =====
+# Para instalação de pacotes
+setuptools==65.5.0
+
+# ===== PIP =====
+# Gerenciador de pacotes
+pip==22.3
+
+# ===== PKG_RESOURCES =====
+# Para recursos de pacotes
+pkg_resources==0.7.4 

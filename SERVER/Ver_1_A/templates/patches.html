@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Patches</h1>
+<table class="table table-striped table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Vendor</th>
+            <th>Patch ID</th>
+            <th>Release Date</th>
+            <th>Severity</th>
+            <th>KB Article</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for patch in patches_list %}
+        <tr>
+            <td>{{ patch.id }}</td>
+            <td>{{ patch.title }}</td>
+            <td>{{ patch.vendor if patch.vendor else 'N/A' }}</td>
+            <td>{{ patch.patch_id if patch.patch_id else 'N/A' }}</td>
+            <td>{{ patch.release_date if patch.release_date else 'N/A' }}</td>
+            <td>{{ patch.severity if patch.severity else 'N/A' }}</td>
+            <td>{{ patch.kb_article if patch.kb_article else 'N/A' }}</td>
+            <td>{{ patch.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="8">No patches found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

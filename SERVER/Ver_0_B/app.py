@@ -1,28 +1,30 @@
+import os, logging, sys
 from flask import Flask, render_template, url_for, flash, redirect, request
 from models.database import db, Organization, User, Asset, Vulnerability
-from config import Config
+from config import CONFIG
 from routes.rotas_site import rt_assets, rt_asset_categories, rt_asset_detail, rt_organizations, rt_vulnerabilities, rt_patches, rt_software, rt_vendors, rt_locations, rt_users, rt_pmoc
 from routes.rotas_agente import rt_agente_checkin
-import os, logging, sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-CAMINHO_PASTA_RAIZ  = Config.CAMINHO_LOG
-
+CAMINHO_PASTA_RAIZ = CONFIG.CAMINHO_LOG
 
 app = Flask(__name__,
-                static_folder='static',
-                template_folder='templates')
-    
-# Configure your PostgreSQL database URI
-# Replace with your actual PostgreSQL connection string
-app.config['SQLALCHEMY_DATABASE_URI'] = Config.SQLALCHEMY_DATABASE_URI
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+            static_folder='static',
+            template_folder='templates')
 
+app.secret_key = CONFIG.SECRET_KEY
+
+# Configuração dos bancos de dados
+app.config['SQLALCHEMY_DATABASE_URI'] = CONFIG.DATABASE_URL_DEFAULT
+app.config['SQLALCHEMY_BINDS'] = CONFIG.SQLALCHEMY_BINDS
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CONFIG.SQLALCHEMY_TRACK_MODIFICATIONS
+
+# Inicializar banco de dados (única instância)
 db.init_app(app)
 
-
+# Registrar blueprints
 app.register_blueprint(rt_asset_categories.bp_asset_categories)
-
 app.register_blueprint(rt_asset_detail.bp_asset_detail)
 app.register_blueprint(rt_organizations.bp_organizations)
 app.register_blueprint(rt_vulnerabilities.bp_vulnerabilities)
@@ -36,12 +38,13 @@ app.register_blueprint(rt_assets.bp_assets)
 app.register_blueprint(rt_pmoc.bp_pmoc)
 
 def create_tables():
+    """Criar tabelas em ambos os bancos de dados"""
     with app.app_context():
+        # Criar tabelas do banco principal e PMOC (usando binds)
         db.create_all()
 
 @app.route('/')
 def index():
-
     organization_count = Organization.query.count()
     user_count = User.query.count()
     asset_count = Asset.query.count()
@@ -58,7 +61,6 @@ def index():
                            vulnerability_count=vulnerability_count,
                            chart_labels=chart_labels,
                            chart_values=chart_values)
-
 
 if __name__ == '__main__':
     create_tables()

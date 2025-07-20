@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-3">
+                <i class="fas fa-laptop"></i> Página de Teste
+            </h1>
+        </div>
+    </div>
+    <form method="POST" action="{{ url_for('teste.info_asset') }}">
+        <div class="row">
+            <div class="col">
+                <input type="text" name="search" class="form-control" placeholder="Pesquisar por nome, tag ou IP">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Pesquisar</button>
+            </div>
+        </div>
+    </form>
+    <div class="row">
+        <div class="col">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>IP</th>
+                        <th>Tag</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assets %}   
+                        <tr>
+                            <td>{{ asset.id }}</td>
+                            <td>{{ asset.name }}</td>
+                            <td>{{ asset.ip_address }}</td>
+                            <td>{{ asset.tag }}</td>
+                            <td>{{ asset.status }}</td>
+                            <td>
+                                <a href="{{ url_for('teste.info_asset', asset_id=asset.id) }}" class="btn btn-primary">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+{% endblock %}

@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Busca no Banco PMOC</h1>
+    
+    <!-- Formulário de Busca -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Buscar Asset no PMOC</h5>
+        </div>
+        <div class="card-body">
+            <form id="searchForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="hostname">Hostname</label>
+                            <input type="text" class="form-control" id="hostname" name="hostname" 
+                                   placeholder="Ex: NBKMT001234" 
+                                   title="Hostname da máquina (patrimônio será extraído automaticamente)">
+                            <small class="form-text text-muted">O patrimônio será extraído automaticamente do hostname</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="tag">Tag</label>
+                            <input type="text" class="form-control" id="tag" name="tag" 
+                                   placeholder="Ex: AB00C00DE" 
+                                   title="Tag do asset">
+                            <small class="form-text text-muted">Tag do asset (opcional)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()">Limpar</button>
+                        <button type="button" class="btn btn-info" onclick="testPatrimonyExtraction()">Testar Extração</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Área de Loading -->
+    <div id="loadingArea" class="d-none">
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Carregando...</span>
+            </div>
+            <p class="mt-2">Buscando no banco PMOC...</p>
+        </div>
+    </div>
+
+    <!-- Resultados da Busca -->
+    <div id="resultsArea" class="d-none">
+        <div class="card">
+            <div class="card-header">
+                <h5>Resultados da Busca</h5>
+            </div>
+            <div class="card-body">
+                <div id="searchInfo" class="alert alert-info mb-3"></div>
+                <div id="resultsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teste de Extração de Patrimônio -->
+    <div id="testResults" class="d-none">
+        <div class="card">
+            <div class="card-header">
+                <h5>Teste de Extração de Patrimônio</h5>
+            </div>
+            <div class="card-body">
+                <div id="testContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    performSearch();
+});
+
+function performSearch() {
+    const hostname = document.getElementById('hostname').value.trim();
+    const tag = document.getElementById('tag').value.trim();
+    
+    if (!hostname && !tag) {
+        alert('Por favor, informe pelo menos o hostname ou a tag.');
+        return;
+    }
+    
+    showLoading();
+    
+    fetch('/pmoc/search/api', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            hostname: hostname,
+            tag: tag
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        displayResults(data);
+    })
+    .catch(error => {
+        hideLoading();
+        alert('Erro na busca: ' + error.message);
+    });
+}
+
+function showLoading() {
+    document.getElementById('loadingArea').classList.remove('d-none');
+    document.getElementById('resultsArea').classList.add('d-none');
+    document.getElementById('testResults').classList.add('d-none');
+}
+
+function hideLoading() {
+    document.getElementById('loadingArea').classList.add('d-none');
+}
+
+function displayResults(data) {
+    const resultsArea = document.getElementById('resultsArea');
+    const searchInfo = document.getElementById('searchInfo');
+    const resultsContent = document.getElementById('resultsContent');
+    
+    if (data.error) {
+        searchInfo.className = 'alert alert-danger';
+        searchInfo.innerHTML = `<strong>Erro:</strong> ${data.error}`;
+        resultsContent.innerHTML = '';
+        resultsArea.classList.remove('d-none');
+        return;
+    }
+    
+    // Informações da busca
+    let searchInfoHtml = '<strong>Parâmetros da Busca:</strong><br>';
+    if (data.search_params) {
+        searchInfoHtml += `Hostname: ${data.search_params.hostname || 'N/A'}<br>`;
+        searchInfoHtml += `Tag: ${data.search_params.tag || 'N/A'}<br>`;
+        searchInfoHtml += `Patrimônio Extraído: ${data.search_params.patrimony_extracted || 'N/A'}<br>`;
+    }
+    searchInfoHtml += `<strong>Total Encontrado:</strong> ${data.total_found || 0} assets`;
+    
+    searchInfo.className = 'alert alert-info';
+    searchInfo.innerHTML = searchInfoHtml;
+    
+    // Resultados
+    let resultsHtml = '';
+    
+    if (data.total_found === 0) {
+        resultsHtml = '<div class="alert alert-warning">Nenhum asset encontrado no banco PMOC.</div>';
+    } else {
+        // Notebooks
+        if (data.notebooks && data.notebooks.length > 0) {
+            resultsHtml += '<h6>Notebooks Encontrados:</h6>';
+            resultsHtml += '<div class="table-responsive mb-3">';
+            resultsHtml += '<table class="table table-striped">';
+            resultsHtml += '<thead><tr><th>ID</th><th>Modelo</th><th>Patrimônio</th><th>Fabricante</th><th>Tag</th><th>Tag UISA</th><th>Status</th><th>Proprietário</th><th>Ações</th></tr></thead>';
+            resultsHtml += '<tbody>';
+            
+            data.notebooks.forEach(notebook => {
+                resultsHtml += `<tr>
+                    <td>${notebook.id}</td>
+                    <td>${notebook.model || 'N/A'}</td>
+                    <td>${notebook.patrimony || 'N/A'}</td>
+                    <td>${notebook.manufacturer || 'N/A'}</td>
+                    <td>${notebook.tag || 'N/A'}</td>
+                    <td>${notebook.tag_uisa || 'N/A'}</td>
+                    <td><span class="badge badge-${getStatusBadgeClass(notebook.status)}">${notebook.status || 'N/A'}</span></td>
+                    <td>${notebook.owner || 'N/A'}</td>
+                    <td><button class="btn btn-sm btn-outline-primary" onclick="viewAssetDetails('${notebook.id}', 'notebook')">Detalhes</button></td>
+                </tr>`;
+            });
+            
+            resultsHtml += '</tbody></table></div>';
+        }
+        
+        // Desktops
+        if (data.desktops && data.desktops.length > 0) {
+            resultsHtml += '<h6>Desktops Encontrados:</h6>';
+            resultsHtml += '<div class="table-responsive mb-3">';
+            resultsHtml += '<table class="table table-striped">';
+            resultsHtml += '<thead><tr><th>ID</th><th>Modelo</th><th>Patrimônio</th><th>Fabricante</th><th>Tag</th><th>Tag UISA</th><th>Status</th><th>Proprietário</th><th>Ações</th></tr></thead>';
+            resultsHtml += '<tbody>';
+            
+            data.desktops.forEach(desktop => {
+                resultsHtml += `<tr>
+                    <td>${desktop.id}</td>
+                    <td>${desktop.model || 'N/A'}</td>
+                    <td>${desktop.patrimony || 'N/A'}</td>
+                    <td>${desktop.manufacturer || 'N/A'}</td>
+                    <td>${desktop.tag || 'N/A'}</td>
+                    <td>${desktop.tag_uisa || 'N/A'}</td>
+                    <td><span class="badge badge-${getStatusBadgeClass(desktop.status)}">${desktop.status || 'N/A'}</span></td>
+                    <td>${desktop.owner || 'N/A'}</td>
+                    <td><button class="btn btn-sm btn-outline-primary" onclick="viewAssetDetails('${desktop.id}', 'desktop')">Detalhes</button></td>
+                </tr>`;
+            });
+            
+            resultsHtml += '</tbody></table></div>';
+        }
+    }
+    
+    resultsContent.innerHTML = resultsHtml;
+    resultsArea.classList.remove('d-none');
+}
+
+function getStatusBadgeClass(status) {
+    if (!status) return 'secondary';
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes('ativo') || statusLower.includes('active')) return 'success';
+    if (statusLower.includes('inativo') || statusLower.includes('inactive')) return 'danger';
+    if (statusLower.includes('manutencao') || statusLower.includes('maintenance')) return 'warning';
+    return 'secondary';
+}
+
+function viewAssetDetails(assetId, assetType) {
+    fetch(`/pmoc/asset/${assetType}/${assetId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Erro ao carregar detalhes: ' + data.error);
+                return;
+            }
+            showAssetDetailsModal(data);
+        })
+        .catch(error => {
+            alert('Erro ao carregar detalhes: ' + error.message);
+        });
+}
+
+function showAssetDetailsModal(asset) {
+    const modalHtml = `
+        <div class="modal fade" id="assetDetailsModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalhes do Asset PMOC</h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Informações Básicas</h6>
+                                <p><strong>ID:</strong> ${asset.id}</p>
+                                <p><strong>Modelo:</strong> ${asset.model || 'N/A'}</p>
+                                <p><strong>Patrimônio:</strong> ${asset.patrimony || 'N/A'}</p>
+                                <p><strong>Fabricante:</strong> ${asset.manufacturer || 'N/A'}</p>
+                                <p><strong>Tipo:</strong> ${asset.type || 'N/A'}</p>
+                                <p><strong>Status:</strong> ${asset.status || 'N/A'}</p>
+                                <p><strong>Proprietário:</strong> ${asset.owner || 'N/A'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Especificações Técnicas</h6>
+                                <p><strong>Processador:</strong> ${asset.processor || 'N/A'}</p>
+                                <p><strong>RAM:</strong> ${asset.ram_memory || 'N/A'}</p>
+                                <p><strong>OS:</strong> ${asset.os_version || 'N/A'}</p>
+                                <p><strong>Arquitetura:</strong> ${asset.os_architecture || 'N/A'}</p>
+                                <p><strong>Valor:</strong> ${asset.equipment_value ? 'R$ ' + asset.equipment_value.toFixed(2) : 'N/A'}</p>
+                                <p><strong>RC:</strong> ${asset.rc || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6>Tags e Controle</h6>
+                                <p><strong>Tag:</strong> ${asset.tag || 'N/A'}</p>
+                                <p><strong>Tag UISA:</strong> ${asset.tag_uisa || 'N/A'}</p>
+                                <p><strong>Tipo de Contrato:</strong> ${asset.contract_type || 'N/A'}</p>
+                                <p><strong>Nota de Entrada:</strong> ${asset.entry_note || 'N/A'}</p>
+                                <p><strong>Criado em:</strong> ${asset.created_at || 'N/A'}</p>
+                                <p><strong>Atualizado em:</strong> ${asset.updated_at || 'N/A'}</p>
+                                <p><strong>Atualizado por:</strong> ${asset.updated_by || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove modal anterior se existir
+    const existingModal = document.getElementById('assetDetailsModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Adiciona o modal ao body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Mostra o modal
+    $('#assetDetailsModal').modal('show');
+}
+
+function testPatrimonyExtraction() {
+    showLoading();
+    
+    fetch('/pmoc/test/patrimony')
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            displayTestResults(data);
+        })
+        .catch(error => {
+            hideLoading();
+            alert('Erro no teste: ' + error.message);
+        });
+}
+
+function displayTestResults(data) {
+    const testResults = document.getElementById('testResults');
+    const testContent = document.getElementById('testContent');
+    
+    if (data.error) {
+        testContent.innerHTML = `<div class="alert alert-danger">Erro: ${data.error}</div>`;
+        testResults.classList.remove('d-none');
+        return;
+    }
+    
+    let html = `
+        <div class="alert alert-info mb-3">
+            <strong>Teste de Extração de Patrimônio</strong><br>
+            Total de casos: ${data.total_cases}<br>
+            Extrações bem-sucedidas: ${data.successful_extractions}
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Hostname</th>
+                        <th>Patrimônio Extraído</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    data.test_results.forEach(result => {
+        const badgeClass = result.extraction_success ? 'success' : 'danger';
+        const statusText = result.extraction_success ? 'Sucesso' : 'Falha';
+        html += `
+            <tr>
+                <td>${result.hostname}</td>
+                <td>${result.patrimony || 'N/A'}</td>
+                <td><span class="badge badge-${badgeClass}">${statusText}</span></td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table></div>';
+    
+    testContent.innerHTML = html;
+    testResults.classList.remove('d-none');
+}
+
+function clearForm() {
+    document.getElementById('hostname').value = '';
+    document.getElementById('tag').value = '';
+    document.getElementById('resultsArea').classList.add('d-none');
+    document.getElementById('testResults').classList.add('d-none');
+}
+</script>
+{% endblock %} 

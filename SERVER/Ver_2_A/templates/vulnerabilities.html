@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Vulnerabilidades</h1>
+<table class="table table-striped table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>CVE ID</th>
+            <th>Title</th>
+            <th>Severity</th>
+            <th>CVSS Score</th>
+            <th>Published Date</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for vul in vulnerabilities_list %}
+        <tr>
+            <td>{{ vul.id }}</td>
+            <td>{{ vul.cve_id if vul.cve_id else 'N/A' }}</td>
+            <td>{{ vul.title }}</td>
+            <td>{{ vul.severity if vul.severity else 'N/A' }}</td>
+            <td>{{ vul.cvss_score if vul.cvss_score else 'N/A' }}</td>
+            <td>{{ vul.published_date if vul.published_date else 'N/A' }}</td>
+            <td>{{ vul.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7">No vulnerabilities found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

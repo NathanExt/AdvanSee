@@ -17,7 +17,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('organizations.organizations') }}">Organizations</a>
+                     <!--<a class="nav-link" href="{{ url_for('organizations.organizations') }}">Organizations</a>-->
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('users.users') }}">Users</a>
@@ -26,13 +26,13 @@
                     <a class="nav-link" href="{{ url_for('assets.assets') }}">Assets</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('asset_categories.asset_categories') }}">Categories</a>
+                    <!--<a class="nav-link" href="{{ url_for('asset_categories.asset_categories') }}">Categories</a>-->
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('vendors.vendors') }}">Vendors</a>
+                    <!--<a class="nav-link" href="{{ url_for('vendors.vendors') }}">Vendors</a>-->
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('locations.locations') }}">Locations</a>
+                    <!--<a class="nav-link" href="{{ url_for('locations.locations') }}">Locations</a>-->
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('software.software') }}">Software</a>
@@ -44,7 +44,7 @@
                     <a class="nav-link" href="{{ url_for('patches.patches') }}">Patches</a>
                 </li>
                 <li class="nav-item">
-                    <!-- Mensagens Flash <a class="nav-link" href="{{ url_for('pmoc.pmoc') }}">PMOC</a>-->
+                    <a class="nav-link" href="{{ url_for('pmoc.pmoc') }}">PMOC</a>
                 </li>
             </ul>
         </div>
@@ -77,5 +77,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
 </body>
 </html>

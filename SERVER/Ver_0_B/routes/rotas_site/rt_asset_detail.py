@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, flash, redirect
 from models.database import db, Asset, AssetSoftware, AssetVulnerability, AssetPatch, Agent, AssetHistory, InstalledSoftware, NetworkInterface, WindowsUpdate # Importar novos modelos
 from comand.comands import COMANDOS # Supondo que 'comand' é um módulo no seu projeto
+from modulos.pmoc.pmoc_search import search_pmoc_asset
 
 bp_asset_detail = Blueprint('asset_detail', __name__)
 
@@ -28,6 +29,21 @@ def dados_asset(asset_id):
         running_processes = agent.configuration.get('running_processes', [])
         windows_services = agent.configuration.get('windows_services', [])
 
+    # Buscar informações no PMOC
+    pmoc_info = None
+    try:
+        # Usa o nome do asset como hostname ou fallback para asset_tag
+        hostname = asset.name if asset.name else asset.asset_tag
+        tag = asset.tag if asset.tag else None
+        
+        if hostname or tag:
+            pmoc_results = search_pmoc_asset(hostname, tag)
+            if pmoc_results and 'error' not in pmoc_results and pmoc_results.get('total_found', 0) > 0:
+                pmoc_info = pmoc_results
+    except Exception as e:
+        print(f"Erro ao buscar informações PMOC para asset {asset_id}: {e}")
+        pmoc_info = None
+
     return (
         asset, 
         asset_software, # Manter para compatibilidade se AssetSoftware ainda for usado
@@ -39,7 +55,8 @@ def dados_asset(asset_id):
         asset_history, 
         agent,
         running_processes,
-        windows_services
+        windows_services,
+        pmoc_info
     )
 
 @bp_asset_detail.route('/asset/<int:asset_id>')
@@ -55,11 +72,9 @@ def asset_detail(asset_id):
      asset_history, 
      agent,
      running_processes,
-     windows_services) = dados_asset(asset_id)
+     windows_services,
+     pmoc_info) = dados_asset(asset_id)
 
-    # A variável 'resposta' não é definida aqui, remova-a se não for usada.
-    # Se for para mostrar alguma mensagem após o comando, o flash é mais adequado.
-    resposta = "Não Carregado" 
     
     return render_template('asset_detail.html',
                            asset=asset,
@@ -73,7 +88,8 @@ def asset_detail(asset_id):
                            agent=agent,
                            running_processes=running_processes, # Nova variável
                            windows_services=windows_services, # Nova variável
-                           resposta=resposta)
+                           pmoc_info=pmoc_info # Nova variável
+                           )
 
 @bp_asset_detail.route('/send_command/<int:asset_id>/<command_type>', methods=['POST'])
 def send_command(asset_id, command_type):
@@ -88,7 +104,8 @@ def send_command(asset_id, command_type):
      asset_history,
      agent,
      running_processes,
-     windows_services) = dados_asset(asset_id)
+     windows_services,
+     pmoc_info) = dados_asset(asset_id)
 
     allowed_commands = ['PROCESSOS', 'FORCE_GPO', 'FORCE_CHECKIN']
     resposta = "Comando não reconhecido ou enviado."

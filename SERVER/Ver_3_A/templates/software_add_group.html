@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="modal fade" id="createGroupModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nueva política de autorización</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">Crear una nueva política para la categorización de software</p>
+                
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs mb-4" id="policyTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab">
+                            <i class="bi bi-gear-fill text-primary"></i> General
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="software-tab" data-bs-toggle="tab" data-bs-target="#software" type="button" role="tab">
+                            <i class="bi bi-display"></i> Software
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="autorizacion-tab" data-bs-toggle="tab" data-bs-target="#autorizacion" type="button" role="tab">
+                            <i class="bi bi-pc-display"></i> Autorización
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="exclusion-tab" data-bs-toggle="tab" data-bs-target="#exclusion" type="button" role="tab">
+                            <i class="bi bi-gear"></i> Exclusión
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="policyTabsContent">
+                    <!-- General Tab -->
+                    <div class="tab-pane fade show active" id="general" role="tabpanel">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="group_name" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control form-control-lg" id="group_name" name="name" required 
+                                           placeholder="Ingresa un nombre para la política.">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="group_description" class="form-label">Descripción</label>
+                                    <input type="text" class="form-control form-control-lg" id="group_description" name="description" 
+                                           placeholder="Ingresa una descripción para la política.">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Software Tab -->
+                    <div class="tab-pane fade" id="software" role="tabpanel">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="group_type" class="form-label">Tipo del Grupo</label>
+                                    <select class="form-select form-select-lg" id="group_type" name="is_required">
+                                        <option value="true">Obrigatório</option>
+                                        <option value="false">Opcional</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="msi_file" class="form-label">Archivo MSI (Opcional)</label>
+                                    <input type="file" class="form-control" id="msi_file" name="msi_file" accept=".msi">
+                                    <div class="form-text">Puedes subir un archivo .msi para instalación automática</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Autorización Tab -->
+                    <div class="tab-pane fade" id="autorizacion" role="tabpanel">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="software_search" class="form-label">Buscar Software</label>
+                                    <input type="text" class="form-control" id="software_search" placeholder="Buscar software...">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-success"><i class="bi bi-check-circle"></i> Software Permitido</h6>
+                                <div id="allowed_software_list" class="border rounded p-3" style="min-height: 200px; max-height: 300px; overflow-y: auto;">
+                                    <div class="text-muted text-center py-4">
+                                        <i class="bi bi-list"></i>
+                                        <p>Nenhum software permitido selecionado</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-danger"><i class="bi bi-x-circle"></i> Software Proibido</h6>
+                                <div id="blocked_software_list" class="border rounded p-3" style="min-height: 200px; max-height: 300px; overflow-y: auto;">
+                                    <div class="text-muted text-center py-4">
+                                        <i class="bi bi-list"></i>
+                                        <p>Nenhum software proibido selecionado</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exclusión Tab -->
+                    <div class="tab-pane fade" id="exclusion" role="tabpanel">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="asset_search" class="form-label">Buscar Assets</label>
+                                    <input type="text" class="form-control" id="asset_search" placeholder="Buscar assets...">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div id="selected_assets_list" class="border rounded p-3" style="min-height: 200px; max-height: 300px; overflow-y: auto;">
+                                    <div class="text-muted text-center py-4">
+                                        <i class="bi bi-pc-display"></i>
+                                        <p>Nenhum asset selecionado</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="createGroup()">
+                    <i class="bi bi-check-circle"></i> Guardar
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

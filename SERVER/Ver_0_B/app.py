@@ -3,7 +3,7 @@ import os, logging, sys
 from flask import Flask, render_template, url_for, flash, redirect, request
 from models.database import db, Organization, User, Asset, Vulnerability
 from config import CONFIG
-from routes.rotas_site import rt_assets, rt_asset_categories, rt_asset_detail, rt_organizations, rt_vulnerabilities, rt_patches, rt_software, rt_vendors, rt_locations, rt_users, rt_pmoc
+from routes.rotas_site import rt_assets, rt_asset_categories, rt_asset_detail, rt_organizations, rt_vulnerabilities, rt_patches, rt_software, rt_vendors, rt_locations, rt_users, rt_pmoc, rt_asset_vulnerabilidades, rt_pmoc_search
 from routes.rotas_agente import rt_agente_checkin
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -37,6 +37,9 @@ app.register_blueprint(rt_locations.bp_locations)
 app.register_blueprint(rt_users.bp_users)
 app.register_blueprint(rt_assets.bp_assets)
 app.register_blueprint(rt_pmoc.bp_pmoc)
+app.register_blueprint(rt_asset_vulnerabilidades.bp_asset_vulnerabilidades)
+app.register_blueprint(rt_pmoc_search.bp_pmoc_search)
+
 
 @app.route('/')
 def index():
@@ -60,6 +63,7 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True,host='0.0.0.0',port=5000)
+    
 
 
 #VER_0_B

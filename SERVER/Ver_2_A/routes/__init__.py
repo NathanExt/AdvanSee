@@ -1,0 +1,1 @@
+# Este arquivo torna a pasta rotas um módulo Python válido 

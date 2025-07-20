@@ -1,0 +1,53 @@
+# AdvanSee Agent - Agente de Coleta de Informações do Sistema
+# Requirements específicos para o agente que roda nos computadores dos usuários
+
+# ===== CRIPTOGRAFIA =====
+cryptography==45.0.5
+Fernet==1.0.1
+
+# ===== REQUESTS HTTP =====
+requests==2.32.4
+urllib3==2.5.0
+
+# ===== PROCESSAMENTO DE DADOS =====
+# Coleta de informações do sistema
+psutil==6.1.0
+
+# ===== INTERFACE GRÁFICA =====
+# Para ícone na bandeja do sistema
+Pillow==11.0.0
+pystray==0.19.5
+
+# ===== WINDOWS MANAGEMENT =====
+# Apenas para Windows - coleta de informações do sistema
+wmi==1.5.1
+pywin32==306
+
+# ===== AGENDAMENTO =====
+# Para agendamento de tarefas
+schedule==1.2.1
+
+# ===== UTILITÁRIOS =====
+# Para formatação de texto e cores no terminal
+colorama==0.4.6
+
+# ===== CERTIFICADOS SSL =====
+# Para requisições HTTPS seguras
+certifi==2025.7.9
+
+# ===== CODIFICAÇÃO =====
+# Para detecção de codificação de caracteres
+charset-normalizer==3.4.2
+
+# ===== IDENTIFICAÇÃO =====
+# Para identificação de idiomas
+idna==3.10
+
+# ===== CFFI =====
+# Para criptografia
+cffi==1.17.1
+pycparser==2.22
+
+# ===== COMPATIBILIDADE =====
+# Para compatibilidade com diferentes versões do Python
+typing-extensions==4.14.1 

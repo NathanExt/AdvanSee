@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-3">
+                <i class="fas fa-laptop"></i> PMOC
+            </h1>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Equipamentos</h5>
+                    <h2 class="card-text">{{ total_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Notebooks</h5>
+                    <h2 class="card-text">{{ notebook_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Desktops</h5>
+                    <h2 class="card-text">{{ desktop_count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Ações</h5>
+                    <form method="GET" action="{{ url_for('pmoc.pmoc_atualiza') }}" style="display:inline;">
+                        <button type="submit" class="btn btn-light btn-sm">
+                            <i class="fas fa-sync-alt"></i> Atualizar Dados
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="assetTypeFilter">Tipo de Equipamento:</label>
+                            <select id="assetTypeFilter" class="form-control">
+                                <option value="">Todos</option>
+                                <option value="Notebook">Notebooks</option>
+                                <option value="Desktop">Desktops</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="statusFilter">Status:</label>
+                            <select id="statusFilter" class="form-control">
+                                <option value="">Todos</option>
+                                <option value="Em uso">Em uso</option>
+                                <option value="Em estoque">Em estoque</option>
+                                <option value="Manutenção">Manutenção</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="manufacturerFilter">Fabricante:</label>
+                            <select id="manufacturerFilter" class="form-control">
+                                <option value="">Todos</option>
+                                <option value="Dell">Dell</option>
+                                <option value="Lenovo">Lenovo</option>
+                                <option value="HP">HP</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="searchInput">Buscar:</label>
+                            <input type="text" id="searchInput" class="form-control" placeholder="ID, Tag, Patrimônio...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Equipamentos -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-table"></i> Equipamentos PMOC
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="pmocTable">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Tipo</th>
+                            <th>ID</th>
+                            <th>Modelo</th>
+                            <th>Patrimônio</th>
+                            <th>Tag</th>
+                            <th>Tag UISA</th>
+                            <th>Valor (R$)</th>
+                            <th>Fabricante</th>
+                            <th>RC</th>
+                            <th>Proprietário</th>
+                            <th>Status</th>
+                            <th>Sistema Operacional</th>
+                            <th>Processador</th>
+                            <th>RAM</th>
+                            <th>Data Criação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asset in pmoc_assets %}
+                        <tr class="asset-row" 
+                            data-type="{{ asset.asset_type }}"
+                            data-status="{{ asset.status }}"
+                            data-manufacturer="{{ asset.manufacturer }}">
+                            <td>
+                                <span class="badge badge-{{ 'primary' if asset.asset_type == 'Notebook' else 'info' }}">
+                                    {{ asset.asset_type }}
+                                </span>
+                            </td>
+                            <td>{{ asset.id }}</td>
+                            <td>{{ asset.model if asset.model else 'N/A' }}</td>
+                            <td>{{ asset.patrimony if asset.patrimony else 'N/A' }}</td>
+                            <td>{{ asset.tag if asset.tag else 'N/A' }}</td>
+                            <td>{{ asset.tag_uisa if asset.tag_uisa else 'N/A' }}</td>
+                            <td>
+                                {% if asset.equipment_value %}
+                                    R$ {{ "{:,.2f}".format(asset.equipment_value) }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ asset.manufacturer if asset.manufacturer else 'N/A' }}</td>
+                            <td>{{ asset.rc if asset.rc else 'N/A' }}</td>
+                            <td>{{ asset.owner if asset.owner else 'N/A' }}</td>
+                            <td>
+                                <span class="badge badge-{{ 'success' if asset.status == 'Em uso' else 'warning' if asset.status == 'Em estoque' else 'danger' }}">
+                                    {{ asset.status if asset.status else 'N/A' }}
+                                </span>
+                            </td>
+                            <td>{{ asset.os_version if asset.os_version else 'N/A' }}</td>
+                            <td>{{ asset.processor if asset.processor else 'N/A' }}</td>
+                            <td>{{ asset.ram_memory if asset.ram_memory else 'N/A' }}</td>
+                            <td>{{ asset.created_at.strftime('%d/%m/%Y') if asset.created_at else 'N/A' }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="15" class="text-center text-muted">
+                                <i class="fas fa-info-circle"></i> Nenhum equipamento encontrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts e CSS externos -->
+<script src="{{ url_for('static', filename='js/pmoc.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pmoc.css') }}">
+
+{% endblock %}

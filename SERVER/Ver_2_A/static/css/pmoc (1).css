@@ -1,0 +1,19 @@
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.table th {
+    background-color: #464646;
+    color: white;
+    border-color: #454d55;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.table-responsive {
+    max-height: 600px;
+    overflow-y: auto;
+} 

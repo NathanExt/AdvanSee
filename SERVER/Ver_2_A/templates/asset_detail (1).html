@@ -1,0 +1,698 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="mb-4">{{ asset.name }}</h1>
+
+<div class="mb-4">
+    <form method="POST" action="{{ url_for('asset_detail.send_command', asset_id=asset.id, command_type='FORCE_GPO') }}" style="display:inline;">
+        <button type="submit" class="btn btn-primary">Atualizar GPO</button>
+    </form>
+    <button type="button" class="btn btn-primary ml-3" data-toggle="modal" data-target="#installMsiModal">
+        <i class="fas fa-download"></i> Instalar MSI
+    </button>
+    <a href="{{ url_for('asset_vulnerabilidades.asset_vulnerabilidades') }}" class="btn btn-secondary ml-3">Vulnerabilidades</a>
+    <a href="{{ url_for('assets.assets') }}" class="btn btn-secondary ml-3">Voltar aos Ativos</a>
+    
+    <!-- Botão de Exclusão -->
+    <button type="button" class="btn btn-danger ml-3" data-toggle="modal" data-target="#deleteAssetModal">
+        <i class="fas fa-trash"></i> Excluir Asset
+    </button>
+</div>
+
+<!-- Modal de Instalação de MSI-->
+
+<div class="modal fade" id="installMsiModal" tabindex="-1" role="dialog" aria-labelledby="installMsiModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title d-flex align-items-center" id="installMsiModalLabel">
+                    <i class="fas fa-download mr-2"></i> Instalar Arquivo MSI
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+  
+            <!-- Corpo -->
+            <div class="modal-body px-4 py-3">
+                <form method="POST" action="{{ url_for('asset_detail.install_msi', asset_id=asset.id) }}" enctype="multipart/form-data">
+            
+                <div class="mb-3">
+                    <label for="fileInput" class="form-label"> <i class="fas fa-file-upload mr-2"></i> Selecione o arquivo MSI</label>
+                    <input type="file" name="file" class="form-control" id="fileInput" required>
+                </div>
+  
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-play mr-1"></i> Instalar
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--
+<div class="modal fade" id="installMsiModal" tabindex="-1" role="dialog" aria-labelledby="installMsiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content shadow-lg rounded-3">
+        
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title d-flex align-items-center" id="installMsiModalLabel">
+                    <i class="fas fa-download mr-2"></i> Instalar Arquivo MSI
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+
+            <div class="modal-body px-4 py-3">
+                <form method="POST" action="{{ url_for('asset_detail.install_msi', asset_id=asset.id) }}" enctype="multipart/form-data">
+            
+                <div class="mb-3">
+                    <label for="fileInput" class="form-label">Selecione o arquivo MSI</label>
+                    <input type="file" name="file" class="form-control" id="fileInput" required>
+                </div>
+  
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-play mr-1"></i> Instalar
+                    </button>
+                </div>
+            
+                </form>
+            </div>
+  
+
+            <div class="modal-footer d-flex justify-content-between">
+                <small class="text-muted">Certifique-se de que o arquivo seja compatível.</small>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteAssetModal" tabindex="-1" role="dialog" aria-labelledby="deleteAssetModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAssetModalLabel">
+                    <i class="fas fa-exclamation-triangle text-danger"></i> Confirmar Exclusão
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Atenção!</h6>
+                    <p>Você está prestes a excluir permanentemente o asset <strong>"{{ asset.name }}"</strong>.</p>
+                    <p>Esta ação irá:</p>
+                    <ul>
+                        <li>Excluir o asset do banco de dados</li>
+                        <li>Remover todos os vínculos associados (agente, software, vulnerabilidades, etc.)</li>
+                        <li>Excluir o histórico do asset</li>
+                        <li>Esta ação <strong>NÃO PODE SER DESFEITA</strong></li>
+                    </ul>
+                </div>
+                <p>Para confirmar, digite o nome do asset: <strong>{{ asset.name }}</strong></p>
+                <input type="text" id="confirmAssetName" class="form-control" placeholder="Digite o nome do asset para confirmar">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <form method="POST" action="{{ url_for('asset_detail.delete_asset', asset_id=asset.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                        <i class="fas fa-trash"></i> Excluir Permanentemente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                Informações Gerais
+            </div>
+            <div class="card-body">
+                <p><strong>ID:</strong> {{ asset.id }}</p>
+                <p><strong>Asset Tag:</strong> {{ asset.asset_tag }}</p>
+                <p><strong>Tag:</strong> {{ asset.tag }}</p>
+                <p><strong>Nome:</strong> {{ asset.name }}</p>
+                <p><strong>Description:</strong> {{ asset.description if asset.description else 'N/A' }}</p>
+                <p><strong>Organization:</strong> {{ asset.organization.name if asset.organization else 'N/A' }}</p>
+                <p><strong>Category:</strong> {{ asset.category.name if asset.category else 'N/A' }}</p>
+                <p><strong>Marca:</strong> {{ asset.computer_manufacturer if asset.computer_manufacturer else 'N/A' }}</p>
+                <p><strong>Modelo:</strong> {{ asset.computer_model if asset.computer_model else 'N/A' }}</p>
+                <p><strong>Número de Série:</strong> {{ asset.serial_number if asset.serial_number else 'N/A' }}</p>
+                <p><strong>Data de Compra:</strong> {{ asset.purchase_date if asset.purchase_date else 'N/A' }}</p>
+                <p><strong>Valor de Compra:</strong> {{ "${:,.2f}".format(asset.purchase_cost) if asset.purchase_cost else 'N/A' }}</p>
+                <p><strong>Garantia:</strong> {{ asset.warranty_expiry if asset.warranty_expiry else 'N/A' }}</p>
+                <p><strong>Status:</strong> {{ asset.status }}</p>
+                <p><strong>IP:</strong> {{ asset.ip_address if asset.ip_address else 'N/A' }}</p>
+                <p><strong>MAC:</strong> {{ asset.mac_address if asset.mac_address else 'N/A' }}</p>
+                <p><strong>Sistema Operacional:</strong> {{ asset.operating_system if asset.operating_system else 'N/A' }}</p>
+                <p><strong>Versão do OS:</strong> {{ asset.os_version if asset.os_version else 'N/A' }}</p>
+                <p><strong>Versão do Python:</strong> {{ asset.python_version if asset.python_version else 'N/A' }}</p>
+                <p><strong>Usuário:</strong> {{ asset.logged_user if asset.logged_user else 'N/A' }}</p>
+                <p><strong>Arquitetura:</strong> {{ asset.architecture if asset.architecture else 'N/A' }}</p>
+                <p><strong>Processador:</strong> {{ asset.processor if asset.processor else 'N/A' }}</p>
+                <p><strong>CPU Cores (Físicas):</strong> {{ asset.cpu_count if asset.cpu_count else 'N/A' }}</p>
+                <p><strong>CPU Cores (Lógicas):</strong> {{ asset.cpu_count_logical if asset.cpu_count_logical else 'N/A' }}</p>
+                <p><strong>CPU Freq (Atual):</strong> {{ "{:,.2f} MHz".format(asset.cpu_freq_current) if asset.cpu_freq_current else 'N/A' }}</p>
+                <p><strong>CPU Freq (Mín):</strong> {{ "{:,.2f} MHz".format(asset.cpu_freq_min) if asset.cpu_freq_min else 'N/A' }}</p>
+                <p><strong>CPU Freq (Max):</strong> {{ "{:,.2f} MHz".format(asset.cpu_freq_max) if asset.cpu_freq_max else 'N/A' }}</p>
+                <p><strong>Último Check-in:</strong> {{ asset.last_seen.strftime('%Y-%m-%d %H:%M:%S') if asset.last_seen else 'N/A' }}</p>
+                <p><strong>Criado em:</strong> {{ asset.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <p><strong>Atualizado em:</strong> {{ asset.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <!--
+        <div class="card mb-4">
+            <div class="card-header">
+                Localização & Atribuição
+            </div>
+            <div class="card-body">
+                <p><strong>Localização:</strong> {{ asset.location.name if asset.location else 'N/A' }}</p>
+                <p><strong>Endereço:</strong> {{ asset.location.address if asset.location and asset.location.address else 'N/A' }}</p>
+                <p><strong>Prédio:</strong> {{ asset.location.building if asset.location and asset.location.building else 'N/A' }}</p>
+                <p><strong>Andar:</strong> {{ asset.location.floor if asset.location and asset.location.floor else 'N/A' }}</p>
+                <p><strong>Sala:</strong> {{ asset.location.room if asset.location and asset.location.room else 'N/A' }}</p>
+                <p><strong>Usuário Atribuído:</strong> {{ asset.assigned_user.username if asset.assigned_user else 'N/A' }}</p>
+                <p><strong>Email do Usuário:</strong> {{ asset.assigned_user.email if asset.assigned_user else 'N/A' }}</p>
+            </div>
+        </div>-->
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Informações do Agente
+            </div>
+            <div class="card-body">
+                {% if agent %}
+                    <p><strong>Versão do Agente:</strong> {{ agent.agent_version }}</p>
+                    <p><strong>Último Check-in:</strong> {{ agent.last_checkin.strftime('%Y-%m-%d %H:%M:%S') if agent.last_checkin else 'N/A' }}</p>
+                    <p><strong>Status:</strong> {{ agent.status }}</p>
+                {% else %}
+                    <p>Nenhum agente associado a este ativo.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Informações do PMOC -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-database"></i> Informações do PMOC
+            </div>
+            <div class="card-body">
+                {% if pmoc_info and pmoc_info.total_found > 0 %}
+                    <div class="alert alert-success">
+                        <strong>Encontrado {{ pmoc_info.total_found }} Registro no banco PMOC</strong>
+                        <small class="d-block mt-1">
+                            Notebooks: {{ pmoc_info.notebooks|length }} | Desktops: {{ pmoc_info.desktops|length }}
+                        </small>
+                        {% if pmoc_info.search_details %}
+                            <hr class="my-2">
+                            <small class="text-muted">
+                                <i class="fas fa-search"></i> 
+                                <strong>Busca realizada por:</strong> 
+                                {% for term in pmoc_info.search_details.searched_terms %}
+                                    <span class="badge badge-info mr-1">{{ term }}</span>
+                                {% endfor %}
+                                <br>
+                                <i class="fas fa-info-circle"></i>
+                            </small>
+                        {% endif %}
+                    </div>
+                    
+                    {% if pmoc_info.notebooks and pmoc_info.notebooks|length > 0 %}
+                        <h6 class="text-primary">
+                            <i class="fas fa-laptop"></i> Notebooks ({{ pmoc_info.notebooks|length }}):
+                        </h6>
+                        {% for notebook in pmoc_info.notebooks %}
+                            <div class="border rounded p-3 mb-3 bg-dark text-light">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>ID:</strong> <code class="bg-secondary text-light px-2 py-1 rounded">{{ notebook.id }}</code></p>
+                                        <p><strong>Modelo:</strong> {{ notebook.model or 'N/A' }}</p>
+                                        <p><strong>Patrimônio:</strong> {{ notebook.patrimony or 'N/A' }}</p>
+                                        <p><strong>Fabricante:</strong> {{ notebook.manufacturer or 'N/A' }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Tag:</strong> {{ notebook.tag or 'N/A' }}</p>
+                                        <p><strong>Tag UISA:</strong> {{ notebook.tag_uisa or 'N/A' }}</p>
+                                        <p><strong>Status:</strong> 
+                                            {% if notebook.status %}
+                                                <span class="badge badge-success">{{ notebook.status }}</span>
+                                            {% else %}
+                                                <span class="badge badge-secondary">N/A</span>
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Proprietário:</strong> {{ notebook.owner or 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-light">
+                                            <i class="fas fa-info-circle"></i> 
+                                            Processador: {{ notebook.processor or 'N/A' }} | 
+                                            RAM: {{ notebook.ram_memory or 'N/A' }} | 
+                                            OS: {{ notebook.os_version or 'N/A' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if pmoc_info.desktops and pmoc_info.desktops|length > 0 %}
+                        <h6 class="text-primary">
+                            <i class="fas fa-desktop"></i> Desktops ({{ pmoc_info.desktops|length }}):
+                        </h6>
+                        {% for desktop in pmoc_info.desktops %}
+                            <div class="border rounded p-3 mb-3 bg-dark text-light">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>ID:</strong> <code class="bg-secondary text-light px-2 py-1 rounded">{{ desktop.id }}</code></p>
+                                        <p><strong>Modelo:</strong> {{ desktop.model or 'N/A' }}</p>
+                                        <p><strong>Patrimônio:</strong> {{ desktop.patrimony or 'N/A' }}</p>
+                                        <p><strong>Fabricante:</strong> {{ desktop.manufacturer or 'N/A' }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Tag:</strong> {{ desktop.tag or 'N/A' }}</p>
+                                        <p><strong>Tag UISA:</strong> {{ desktop.tag_uisa or 'N/A' }}</p>
+                                        <p><strong>Status:</strong> 
+                                            {% if desktop.status %}
+                                                <span class="badge badge-success">{{ desktop.status }}</span>
+                                            {% else %}
+                                                <span class="badge badge-secondary">N/A</span>
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Proprietário:</strong> {{ desktop.owner or 'N/A' }}</p>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small class="text-light">
+                                            <i class="fas fa-info-circle"></i> 
+                                            Processador: {{ desktop.processor or 'N/A' }} | 
+                                            RAM: {{ desktop.ram_memory or 'N/A' }} | 
+                                            OS: {{ desktop.os_version or 'N/A' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <a href="/pmoc/search?hostname={{ asset.name or asset.asset_tag }}&tag={{ asset.tag or '' }}" 
+                           class="btn btn-outline-primary btn-sm" target="_blank">
+                            <i class="fas fa-search"></i> Buscar Detalhes no PMOC
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Nenhuma informação encontrada no banco PMOC para este asset.
+                        {% if asset.name or asset.tag %}
+                            <br><small class="text-muted">
+                                Parâmetros de busca: Hostname: "{{ asset.name or asset.asset_tag }}", Tag: "{{ asset.tag or 'N/A' }}"
+                            </small>
+                        {% endif %}
+                    </div>
+                    <div class="mt-3">
+                        <a href="/pmoc/search?hostname={{ asset.name or asset.asset_tag }}&tag={{ asset.tag or '' }}" 
+                           class="btn btn-outline-secondary btn-sm" target="_blank">
+                            <i class="fas fa-search"></i> Tentar Busca Manual no PMOC
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Informações de Memória
+            </div>
+            <div class="card-body">
+                <p><strong>Memória Total:</strong> {{ "{:,.2f} GB".format(asset.total_memory_bytes / (1024**3)) if asset.total_memory_bytes else 'N/A' }}</p>
+                <p><strong>Memória Disponível:</strong> {{ "{:,.2f} GB".format(asset.available_memory_bytes / (1024**3)) if asset.available_memory_bytes else 'N/A' }}</p>
+                <p><strong>Percentual de Uso de Memória:</strong> {{ "{:,.2f}%".format(asset.memory_percent) if asset.memory_percent else 'N/A' }}</p>
+                {% if agent and agent.configuration and agent.configuration.memory_info and agent.configuration.memory_info.modules %}
+                    <h6>Módulos de Memória:</h6>
+                    <ul class="list-unstyled">
+                    {% for module in agent.configuration.memory_info.modules %}
+                        <li>- Fabricante: {{ module.manufacturer }}, Part #: {{ module.part_number }}, Capacidade: {{ "{:,.2f} GB".format(module.capacity_bytes / (1024**3)) }}, Velocidade: {{ module.speed_mhz }} MHz</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Informações de Disco
+            </div>
+            <div class="card-body">
+                <p><strong>Disco Total:</strong> {{ "{:,.2f} GB".format(asset.total_disk_bytes / (1024**3)) if asset.total_disk_bytes else 'N/A' }}</p>
+                <p><strong>Disco Usado:</strong> {{ "{:,.2f} GB".format(asset.used_disk_bytes / (1024**3)) if asset.used_disk_bytes else 'N/A' }}</p>
+                <p><strong>Disco Livre:</strong> {{ "{:,.2f} GB".format(asset.free_disk_bytes / (1024**3)) if asset.free_disk_bytes else 'N/A' }}</p>
+                <p><strong>Percentual de Uso de Disco:</strong> {{ "{:,.2f}%".format(asset.disk_percent) if asset.disk_percent else 'N/A' }}</p>
+                <p><strong>Modelo do Disco:</strong> {{ asset.disk_model if asset.disk_model else 'N/A' }}</p>
+                <p><strong>Número de Série do Disco:</strong> {{ asset.disk_serial if asset.disk_serial else 'N/A' }}</p>
+                <p><strong>Tipo de Interface do Disco:</strong> {{ asset.disk_interface_type if asset.disk_interface_type else 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Software Instalado (Descoberto pelo Agente)
+    </div>
+    <div class="card-body">
+        {% if installed_software_entries %}
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Nome do Software</th>
+                    <th>Fornecedor</th>
+                    <th>Versão</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in installed_software_entries %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.vendor if item.vendor else 'N/A' }}</td>
+                    <td>{{ item.version if item.version else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhum software instalado foi descoberto por este ativo.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Interfaces de Rede
+    </div>
+    <div class="card-body">
+        {% if network_interfaces %}
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Nome da Interface</th>
+                    <th>Família</th>
+                    <th>Endereço</th>
+                    <th>Máscara de Rede</th>
+                    <th>Broadcast</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ni in network_interfaces %}
+                <tr>
+                    <td>{{ ni.name }}</td>
+                    <td>{{ ni.family }}</td>
+                    <td>
+                        {% if ni.ip_address %}{{ ni.ip_address }}
+                        {% elif ni.mac_address %}{{ ni.mac_address }}
+                        {% else %}N/A{% endif %}
+                    </td>
+                    <td>{{ ni.netmask if ni.netmask else 'N/A' }}</td>
+                    <td>{{ ni.broadcast if ni.broadcast else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhuma interface de rede encontrada para este ativo.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Atualizações do Windows
+    </div>
+    <div class="card-body">
+        {% if windows_updates %}
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>ID do HotFix</th>
+                    <th>Descrição</th>
+                    <th>Data de Instalação</th>
+                    <th>Instalado Por</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wu in windows_updates %}
+                <tr>
+                    <td>{{ wu.hotfix_id }}</td>
+                    <td>{{ wu.description if wu.description else 'N/A' }}</td>
+                    <td>{{ wu.installed_on if wu.installed_on else 'N/A' }}</td>
+                    <td>{{ wu.installed_by if wu.installed_by else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhuma atualização do Windows encontrada para este ativo.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Processos em Execução (Do Último Check-in do Agente)
+    </div>
+    <div class="card-body">
+        {% if running_processes %}
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>PID</th>
+                    <th>Nome</th>
+                    <th>% CPU</th>
+                    <th>% Memória</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proc in running_processes %}
+                <tr>
+                    <td>{{ proc.pid }}</td>
+                    <td>{{ proc.name }}</td>
+                    <td>{{ "{:,.2f}%".format(proc.cpu_percent) }}</td>
+                    <td>{{ "{:,.5f}%".format(proc.memory_percent) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhum processo em execução relatado pelo agente no último check-in.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Serviços do Windows (Do Último Check-in do Agente)
+    </div>
+    <div class="card-body">
+        {% if windows_services %}
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Nome do Serviço</th>
+                    <th>Status</th>
+                    <th>Tipo de Início</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in windows_services %}
+                <tr>
+                    <td>{{ service.Name }}</td>
+                    <td>{{ service.Status }}</td>
+                    <td>{{ service.StartType }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhum serviço do Windows relatado pelo agente no último check-in.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+<div class="card mb-4">
+    <div class="card-header">
+        Vulnerabilidades Associadas
+    </div>
+    <div class="card-body">
+        {% if asset_vulnerabilities %}
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>ID CVE</th>
+                    <th>Título</th>
+                    <th>Severidade</th>
+                    <th>Pontuação CVSS</th>
+                    <th>Status</th>
+                    <th>Data Detectada</th>
+                    <th>Data Resolvida</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for av in asset_vulnerabilities %}
+                <tr>
+                    <td>{{ av.vulnerability.cve_id if av.vulnerability else 'N/A' }}</td>
+                    <td>{{ av.vulnerability.title if av.vulnerability else 'N/A' }}</td>
+                    <td>{{ av.vulnerability.severity if av.vulnerability else 'N/A' }}</td>
+                    <td>{{ av.vulnerability.cvss_score if av.vulnerability else 'N/A' }}</td>
+                    <td>{{ av.status }}</td>
+                    <td>{{ av.detected_date.strftime('%Y-%m-%d %H:%M:%S') if av.detected_date else 'N/A' }}</td>
+                    <td>{{ av.resolved_date.strftime('%Y-%m-%d %H:%M:%S') if av.resolved_date else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhuma vulnerabilidade encontrada para este ativo.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Patches Aplicados
+    </div>
+    <div class="card-body">
+        {% if asset_patches %}
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Título do Patch</th>
+                    <th>Fornecedor</th>
+                    <th>ID do Patch</th>
+                    <th>Status</th>
+                    <th>Data de Instalação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ap in asset_patches %}
+                <tr>
+                    <td>{{ ap.patch.title if ap.patch else 'N/A' }}</td>
+                    <td>{{ ap.patch.vendor if ap.patch else 'N/A' }}</td>
+                    <td>{{ ap.patch.patch_id if ap.patch else 'N/A' }}</td>
+                    <td>{{ ap.status }}</td>
+                    <td>{{ ap.installed_date.strftime('%Y-%m-%d %H:%M:%S') if ap.installed_date else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhum patch aplicado a este ativo.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Histórico do Ativo
+    </div>
+    <div class="card-body">
+        {% if asset_history %}
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Ação</th>
+                    <th>Campo</th>
+                    <th>Valor Antigo</th>
+                    <th>Novo Valor</th>
+                    <th>Realizado Por</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for history in asset_history %}
+                <tr>
+                    <td>{{ history.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ history.action }}</td>
+                    <td>{{ history.field_name if history.field_name else 'N/A' }}</td>
+                    <td>{{ history.old_value if history.old_value else 'N/A' }}</td>
+                    <td>{{ history.new_value if history.new_value else 'N/A' }}</td>
+                    <td>{{ history.user.username if history.user else 'Sistema' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhum registro de histórico para este ativo.</p>
+        {% endif %}
+    </div>
+</div>
+
+<a href="{{ url_for('assets.assets') }}" class="btn btn-secondary mb-4">Voltar aos Ativos</a>
+
+<script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+
+<script>
+// Validação do modal de exclusão
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmInput = document.getElementById('confirmAssetName');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const assetName = '{{ asset.name }}';
+    
+    if (confirmInput && confirmBtn) {
+        confirmInput.addEventListener('input', function() {
+            if (this.value === assetName) {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.remove('btn-secondary');
+                confirmBtn.classList.add('btn-danger');
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.remove('btn-danger');
+                confirmBtn.classList.add('btn-secondary');
+            }
+        });
+        
+        // Limpar input quando modal for fechado
+        $('#deleteAssetModal').on('hidden.bs.modal', function() {
+            confirmInput.value = '';
+            confirmBtn.disabled = true;
+            confirmBtn.classList.remove('btn-danger');
+            confirmBtn.classList.add('btn-secondary');
+        });
+    }
+});
+</script>
+{% endblock %}

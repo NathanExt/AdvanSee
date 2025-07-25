@@ -32,6 +32,7 @@
             <div class="d-flex justify-content-end gap-2">
                 <!-- Status Buttons -->
                 <div class="btn-group" role="group">
+                    <!--
                     <button type="button" class="btn btn-outline-secondary btn-sm">
                         <i class="bi bi-globe"></i> {{ asset.status or 'Status' }}
                         <i class="bi bi-pencil ms-1"></i>
@@ -39,15 +40,19 @@
                     <button type="button" class="btn btn-outline-secondary btn-sm">
                         <i class="bi bi-geo-alt"></i> Localização
                         <i class="bi bi-pencil ms-1"></i>
-                    </button>
+                    </button>-->
                     <button type="button" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-person"></i> Responsável
-                        <i class="bi bi-pencil ms-1"></i>
+                        <i class="bi bi-person"></i>
+                            <div>
+                                {{ ad_user.display_name  or asset.logged_user}}
+                            </div>
+                        {{ ad_user.email_address }}
                     </button>
                 </div>
   
                 <!-- Action Buttons -->
                 <div class="btn-group" role="group">
+                    <!--
                     <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#installMsiModal">
                         <i class="bi bi-download"></i>
                     </button>
@@ -60,6 +65,7 @@
                     <button type="button" class="btn btn-outline-secondary btn-sm">
                         <i class="bi bi-gear"></i>
                     </button>
+                    -->
                 </div>
             </div>
         </div>
@@ -94,17 +100,17 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="solicitudes-tab" data-bs-toggle="tab" data-bs-target="#solicitudes" type="button" role="tab">
+        <button class="nav-link" id="solicita-tab" data-bs-toggle="tab" data-bs-target="#solicita" type="button" role="tab">
             <i class="bi bi-clipboard"></i> Solicitações
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="despliegue-tab" data-bs-toggle="tab" data-bs-target="#despliegue" type="button" role="tab">
+        <button class="nav-link" id="implanta-tab" data-bs-toggle="tab" data-bs-target="#implanta" type="button" role="tab">
             <i class="bi bi-arrow-repeat"></i> Implantação
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="actividad-tab" data-bs-toggle="tab" data-bs-target="#actividad" type="button" role="tab">
+        <button class="nav-link" id="atividade-tab" data-bs-toggle="tab" data-bs-target="#atividade" type="button" role="tab">
             <i class="bi bi-activity"></i> Atividade
         </button>
     </li>
@@ -497,7 +503,7 @@
 </div>
     </div>
     
-    <!-- Dados Financeiros Tab -->
+    <!-- Dados financeiro Tab -->
     <div class="tab-pane fade" id="financeiro" role="tabpanel">
         <div class="row">
             <div class="col-md-6">
@@ -532,8 +538,8 @@
 </div>
     </div>
     
-    <!-- Solicitudes Tab -->
-    <div class="tab-pane fade" id="solicitudes" role="tabpanel">
+    <!-- solicita Tab -->
+    <div class="tab-pane fade" id="solicita" role="tabpanel">
         <div class="card">
             <div class="card-body text-center">
                 <i class="bi bi-clipboard text-muted" style="font-size: 3rem;"></i>
@@ -543,8 +549,8 @@
 </div>
     </div>
     
-    <!-- Despliegue Tab -->
-    <div class="tab-pane fade" id="despliegue" role="tabpanel">
+    <!-- implementa Tab -->
+    <div class="tab-pane fade" id="implanta" role="tabpanel">
         <div class="card">
             <div class="card-body text-center">
                 <i class="bi bi-arrow-repeat text-muted" style="font-size: 3rem;"></i>
@@ -554,8 +560,8 @@
 </div>
     </div>
     
-    <!-- Actividad Tab -->
-    <div class="tab-pane fade" id="actividad" role="tabpanel">
+    <!-- atividade Tab -->
+    <div class="tab-pane fade" id="atividade" role="tabpanel">
         <div class="card">
             <div class="card-header">
                 <h6 class="mb-0">Histórico de Atividades</h6>
@@ -592,13 +598,17 @@
 
     <!-- Eventos Tab -->
     <div class="tab-pane fade" id="eventos" role="tabpanel">
-        <div class="card">
-            <div class="card-body text-center">
-                <i class="bi bi-check-circle text-muted" style="font-size: 3rem;"></i>
-                <h5 class="text-muted mt-3">Nenhum evento</h5>
-                <p class="text-muted">Este ativo não possui eventos associados.</p>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="text-muted mt-3">Nenhum evento</h5>
+                    <p class="text-muted">Este ativo não possui eventos associados.</p>
+                </div>
+
             </div>
         </div>
+        <button class="btn btn-primary btn-block mt-3" data-bs-toggle="modal" data-bs-target="#create-event-modal">Habilitas Eventos</button>
     </div>
     
 </div>

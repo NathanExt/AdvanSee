@@ -1,6 +1,9 @@
 
+
+
+
 import os, logging, sys
-from flask import Flask, render_template, url_for, flash, redirect, request
+from flask import Flask, render_template
 from models.database import db, Organization, User, Asset, Vulnerability
 from config import CONFIG
 from routes.rotas_site import rt_config, rt_assets, rt_asset_categories, rt_asset_detail, rt_organizations, rt_vulnerabilities, rt_patches, rt_software, rt_vendors, rt_locations, rt_users, rt_pmoc, rt_asset_vulnerabilidades, rt_pmoc_search

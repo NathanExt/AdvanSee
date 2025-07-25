@@ -15,7 +15,8 @@
     justify-content: center;
     width: 60px;
     height: 60px;
-    background: rgba(13, 110, 253, 0.1);
+    background: var(--secondary-color);
+    color: var(--primary-color);
     border-radius: 50%;
 }
 
@@ -163,20 +164,20 @@
     .asset-header .row {
         flex-direction: column;
     }
-    
+
     .asset-header .col-md-4 {
         margin-top: 15px;
     }
-    
+
     .btn-group {
         flex-wrap: wrap;
     }
-    
+
     .nav-tabs {
         overflow-x: auto;
         white-space: nowrap;
     }
-    
+
     .nav-tabs .nav-link {
         padding: 8px 12px;
         font-size: 0.9rem;
@@ -355,4 +356,4 @@
 .modal-footer {
     border-top: 1px solid #dee2e6;
     border-radius: 0 0 10px 10px;
-} 
+}

@@ -2,49 +2,51 @@
 
 /* Tema Claro (Padrão) */
 .theme-light {
-  --primary-color: #1976d2; /* azul vibrante */
-  --secondary-color: #90caf9; /* azul claro */
-  --background-color: #f5f5f5; /* cinza muito claro */
-  --surface-color: #ffffff;
-  --card-color: #e3f2fd; /* azul muito claro */
-  --text-primary: #212121; /* quase preto */
-  --text-secondary: #424242; /* cinza escuro */
-  --text-muted: #9e9e9e; /* cinza médio */
-  --border-color: #e0e0e0; /* cinza claro */
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  
-  --success-color: #4caf50; /* verde sucesso */
-  --warning-color: #ff9800; /* laranja alerta */
-  --danger-color: #f44336; /* vermelho */
-  --info-color: #2196f3; /* azul info */
+    --primary-color: #1976d2; /* azul vibrante */
+    --secondary-color: #90caf9; /* azul claro */
+    --background-color: #ffffff; /* cinza muito claro */
+    --surface-color: #f4f4f4;
+    --card-color: #e3f2fd; /* azul muito claro */
+    --text-primary: #252323; /* quase preto */
+    --text-secondary: #424242; /* cinza escuro */
+    --text-sidebar: #ffffff;
+    --text-muted: #ffffff; /* cinza médio */
+    --border-color: #e0e0e0; /* cinza claro */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --navtabs-color: #000000;
+    --success-color: #4caf50; /* verde sucesso */
+    --warning-color: #ff9800; /* laranja alerta */
+    --danger-color: #f44336; /* vermelho */
+    --info-color: #2196f3; /* azul info */
 
-  --link-color: #1e88e5;
-  --link-hover-color: #1565c0;
+    --link-color: #1e88e5;
+    --link-hover-color: #1565c0;
 
-  --input-bg: #ffffff;
-  --input-border: #cccccc;
-  --input-text: #212121;
+    --input-bg: #ffffff;
+    --input-border: #cccccc;
+    --input-text: #212121;
 
-  --table-bg: #ffffff;
-  --table-border: #e0e0e0;
-  --table-header-bg: #f1f1f1;
-  --table-row-hover: #e3f2fd;
+    --table-bg: #ffffff;
+    --table-border: #e0e0e0;
+    --table-header-bg: #f1f1f1;
+    --table-row-hover: #e3f2fd;
 
-  --dropdown-bg: #ffffff;
-  --dropdown-border: #cccccc;
-  --dropdown-text: #212121;
+    --dropdown-bg: #ffffff;
+    --dropdown-border: #cccccc;
+    --dropdown-text: #212121;
 
-  --modal-bg: #ffffff;
-  --modal-header-bg: #f1f1f1;
-  --modal-border: #cccccc;
+    --modal-bg: #ffffff;
+    --modal-header-bg: #f1f1f1;
+    --modal-border: #cccccc;
 
-  --tooltip-bg: #616161;
-  --tooltip-text: #ffffff;
+    --tooltip-bg: #616161;
+    --tooltip-text: #ffffff;
 
-  --scrollbar-track: #f0f0f0;
-  --scrollbar-thumb: #c0c0c0;
-  --scrollbar-thumb-hover: #a0a0a0;
+    --scrollbar-track: #f0f0f0;
+    --scrollbar-thumb: #c0c0c0;
+    --scrollbar-thumb-hover: #a0a0a0;
 }
+
 
 
 /* Tema Escuro */
@@ -59,7 +61,7 @@
     --text-muted: #b0b0b0;
     --border-color: #404040;
     --shadow-color: rgba(0, 0, 0, 0.5);
-    --success-color: #10b981;
+    --success-color: #3f3f3f;
     --warning-color: #f59e0b;
     --danger-color: #ef4444;
     --info-color: #2c2c2c;
@@ -106,7 +108,7 @@
     --primary-color: #059669;
     --secondary-color: #047857;
     --background-color: #ffffff;
-    --surface-color: #f0fdf4;
+    --surface-color: #00ff4d;
     --text-primary: #1f2937;
     --text-secondary: #6b7280;
     --border-color: #d1d5db;
@@ -161,6 +163,7 @@ body {
     color: var(--text-primary);
 }
 
+
 /* Listas e elementos de lista */
 .list-group, .list-group-item {
     background-color: var(--card-color);
@@ -214,18 +217,18 @@ body {
 
 /* Botões */
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: var(--primary-color);
     border: none;
     color: white;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    background: var(--secondary-color);
     color: white;
 }
 
 .btn-secondary {
-    background-color: var(--surface-color);
+    background-color: var(--primary-color);
     border-color: var(--border-color);
     color: var(--text-primary);
 }
@@ -513,7 +516,7 @@ a:hover {
     color: var(--text-primary) !important;
 }
 
-.theme-dark h1, .theme-dark h2, .theme-dark h3, 
+.theme-dark h1, .theme-dark h2, .theme-dark h3,
 .theme-dark h4, .theme-dark h5, .theme-dark h6 {
     color: var(--text-primary) !important;
 }

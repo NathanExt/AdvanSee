@@ -28,8 +28,13 @@ class CONFIG:
     DATABASE_URL_DEFAULT = (
         f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME_DEFAULT}"
     )
-    
-    
+
+    # Banco principal - USERS
+    DB_NAME_USERS = "DB_USERS"
+    DATABASE_URL_USERS = (
+        f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME_USERS}"
+    )
+
     # Banco PMOC
     DB_NAME_PMOC = "DB_PMOC"
     DATABASE_URL_PMOC = (
@@ -41,5 +46,6 @@ class CONFIG:
     
     # Configuração de múltiplos bancos
     SQLALCHEMY_BINDS = {
-        'pmoc': DATABASE_URL_PMOC
+        'pmoc': DATABASE_URL_PMOC,
+        'user': DATABASE_URL_USERS
     }

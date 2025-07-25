@@ -1,12 +1,19 @@
+
+
+
+
+
 from flask import Blueprint, render_template, flash, redirect, request, url_for
 from models.database import db, Asset, AssetSoftware, AssetVulnerability, AssetPatch, Agent, AssetHistory, InstalledSoftware, NetworkInterface, WindowsUpdate, PmocAsset # Importar novos modelos
 from comand.comands import COMANDOS # Supondo que 'comand' é um módulo no seu projeto
 from modulos.pmoc.pmoc_search import search_pmoc_asset
+from modulos.ad_users.ad_search import search_ad_user
 import os
 bp_asset_detail = Blueprint('asset_detail', __name__)
 
 def dados_asset(asset_id):
     asset = Asset.query.get_or_404(asset_id)
+
     # Busca de software original (se ainda for usada para licenças, etc.)
     asset_software = AssetSoftware.query.filter_by(asset_id=asset.id).options(db.joinedload(AssetSoftware.software)).all()
     
@@ -59,10 +66,26 @@ def dados_asset(asset_id):
         pmoc_info
     )
 
+def dados_user(asset_id):
+    asset = Asset.query.get_or_404(asset_id)
+    print(asset.logged_user.split('>')[1])
+    user_data = search_ad_user(asset.logged_user.split('>')[1])
+    
+    if user_data:
+        print(user_data['display_name'])
+        return user_data
+    else:
+        print("Usuário não encontrado no AD")
+        return None
+
+
+
+
 @bp_asset_detail.route('/asset/<int:asset_id>')
 def asset_detail(asset_id):
     # Desempacotar todas as variáveis retornadas por dados_asset
-    (asset, 
+    ad_user = dados_user(asset_id)
+    (asset,
      asset_software, 
      installed_software_entries, 
      network_interfaces, 
@@ -88,7 +111,8 @@ def asset_detail(asset_id):
                            agent=agent,
                            running_processes=running_processes, # Nova variável
                            windows_services=windows_services, # Nova variável
-                           pmoc_info=pmoc_info # Nova variável
+                           pmoc_info=pmoc_info, # Nova variável
+                           ad_user = ad_user
                            )
 
 @bp_asset_detail.route('/send_command/<int:asset_id>/<command_type>', methods=['POST'])
@@ -240,3 +264,9 @@ def delete_asset(asset_id):
         print(error_msg)
         flash(error_msg, 'danger')
         return redirect(url_for('asset_detail.asset_detail', asset_id=asset_id))
+
+
+@bp_asset_detail.route('/asset/<int:asset_id>/active_events', methods=['POST'])
+def active_events(asset_id):
+    print("HABILITAR EVENTOS")
+    pass

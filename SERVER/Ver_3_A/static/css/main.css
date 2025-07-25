@@ -14,6 +14,7 @@ body {
     border: none;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
 }
 
 .btn {
@@ -65,8 +66,7 @@ body {
     left: 0;
     height: 100vh;
     width: 280px;
-    background: linear-gradient(135deg, var(--primary-color) 50%, var(--secondary-color) 100%);;
-    color: white;
+    /*background: linear-gradient(135deg, var(--primary-color) 50%, var(--secondary-color) 100%);*/
     z-index: 1000;
     transition: all 0.3s ease;
     overflow-y: auto;
@@ -77,7 +77,7 @@ body {
 }
 
 .sidebar-header {
-    padding: 20px;
+    padding: 16px;
     text-align: center;
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
@@ -104,7 +104,7 @@ element.style {
 }
 
 .nav-link {
-    color: rgba(255,255,255,0.8);
+    color: var(--navtabs-color);
     padding: 12px 20px;
     display: flex;
     align-items: center;
@@ -114,14 +114,14 @@ element.style {
 }
 
 .nav-link:hover {
-    color: white;
-    background-color: rgba(255,255,255,0.1);
+    color: var(--primary-color);
+    background-color: var(--background-color);
     border-left-color: #fff;
 }
 
 .nav-link.active {
-    color: white;
-    background-color: rgba(255,255,255,0.2);
+    color: #ff0000;
+    background-color: rgb(255, 0, 0);
     border-left-color: #fff;
 }
 
@@ -151,14 +151,14 @@ element.style {
 
 .sidebar-toggle {
     position: fixed;
-    top: 20px;
-    left: 290px;
+    top: 56px;
+    left: 279px;
     z-index: 1001;
     background: #667eea;
     border: none;
     color: white;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 3px;
+    border-radius: 2px;
     cursor: pointer;
     transition: all 0.3s ease;
 }

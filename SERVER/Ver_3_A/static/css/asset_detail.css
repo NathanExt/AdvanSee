@@ -139,10 +139,10 @@
 }
 
 .timeline-content {
-    background: #f8f9fa;
+    background: linear-gradient(100deg, var(--active-secondary), var(--active-primary));;
     padding: 15px;
     border-radius: 8px;
-    border-left: 3px solid #0d6efd;
+    border-left: 3px solid var(--surface-color);
 }
 
 /* Software Card */

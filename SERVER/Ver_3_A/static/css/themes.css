@@ -2,26 +2,27 @@
 
 /* Tema Claro (Padrão) */
 .theme-light {
-    --primary-color: #1976d2; /* azul vibrante */
-    --secondary-color: #90caf9; /* azul claro */
-    --background-color: #ffffff; /* cinza muito claro */
+    --primary-color: #1976d2;
+    --secondary-color: #90caf9;
+    --background-color: #ffffff; 
     --surface-color: #f4f4f4;
-    --card-color: #e3f2fd; /* azul muito claro */
-    --text-primary: #252323; /* quase preto */
-    --text-secondary: #424242; /* cinza escuro */
+    --card-color: #e3f2fd; 
+    --text-primary: #252323; 
+    --text-secondary: #424242; 
     --text-sidebar: #ffffff;
-    --text-muted: #ffffff; /* cinza médio */
+    --text-muted: #3a3a3a;
     --border-color: #e0e0e0; /* cinza claro */
     --shadow-color: rgba(0, 0, 0, 0.1);
     --navtabs-color: #000000;
     --success-color: #4caf50; /* verde sucesso */
     --warning-color: #ff9800; /* laranja alerta */
     --danger-color: #f44336; /* vermelho */
-    --info-color: #2196f3; /* azul info */
-
+    --info-color: #2196f3; 
     --link-color: #1e88e5;
     --link-hover-color: #1565c0;
 
+    --active-primary:#ffffff;
+    --active-secondary:#2196f3;
     --input-bg: #ffffff;
     --input-border: #cccccc;
     --input-text: #212121;
@@ -85,6 +86,9 @@
     --scrollbar-track: #1a1a1a;
     --scrollbar-thumb: #404040;
     --scrollbar-thumb-hover: #606060;
+
+    --active-primary:#404040;
+    --active-secondary:#1a1a1a;
 }
 
 /* Tema Azul */
@@ -482,6 +486,7 @@ a:hover {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
+
 /* Melhorias para acessibilidade */
 .theme-dark .form-control::placeholder {
     color: var(--text-secondary);
@@ -513,12 +518,12 @@ a:hover {
 /* Estilos específicos para tema escuro */
 .theme-dark {
     /* Garantir que todos os textos sejam brancos */
-    color: var(--text-primary) !important;
+    color: var(--text-primary)
 }
 
 .theme-dark h1, .theme-dark h2, .theme-dark h3,
 .theme-dark h4, .theme-dark h5, .theme-dark h6 {
-    color: var(--text-primary) !important;
+    color: var(--text-primary)
 }
 
 .theme-dark p, .theme-dark span, .theme-dark div {
@@ -532,6 +537,8 @@ a:hover {
 .theme-dark .card-title {
     color: var(--text-primary);
 }
+
+
 
 .theme-dark .card-text {
     color: var(--text-secondary);

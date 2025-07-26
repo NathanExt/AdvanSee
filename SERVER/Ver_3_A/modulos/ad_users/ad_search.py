@@ -17,40 +17,19 @@ class ACTIVE_DIRECTORY:
     def search_user_by_id(self, user_id):
         print("USER_ID: ",user_id)
 
-        # Buscar o usuário completo
-        user = self.session.query(ADUser).filter(ADUser.sam_account_name == user_id).first()
-
-        if user:
-            user_data = {
-                'display_name': user.display_name,
-                'email_address': user.email_address,
-                'given_name': user.given_name,
-                'surname': user.surname,
-                'enabled': user.enabled,
-                'sam_account_name': user.sam_account_name
-            }
-        else:
-            user_data = None
-
+        user_data = {
+            'display_name' : self.session.query(ADUser.display_name).filter(ADUser.sam_account_name == user_id).all(),
+            'email_address': self.session.query(ADUser.email_address).filter(ADUser.sam_account_name == user_id).all()
+        }
         print("USER_DATA: ",user_data)
         return user_data
 
     def search_user_by_email(self, email):
-        # Buscar o usuário completo
-        user = self.session.query(ADUser).filter(ADUser.sam_account_name == email).first()
-        
-        if user:
-            user_data = {
-                'display_name': user.display_name,
-                'email_address': user.email_address,
-                'given_name': user.given_name,
-                'surname': user.surname,
-                'enabled': user.enabled,
-                'sam_account_name': user.sam_account_name
-            }
-        else:
-            user_data = None
-            
+
+        user_data = {
+            'display_name' : self.session.query(ADUser.display_name).filter(ADUser.sam_account_name == email).all(),
+            'email_address': self.session.query(ADUser.email_address).filter(ADUser.sam_account_name == email).all()
+        }
         return user_data
 
 

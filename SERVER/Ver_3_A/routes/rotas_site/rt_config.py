@@ -54,9 +54,9 @@ LANGUAGES = [
 THEMES = [
     {'value': 'light', 'label': 'Claro', 'icon': 'bi-sun', 'description': 'Tema claro padrão'},
     {'value': 'dark', 'label': 'Escuro', 'icon': 'bi-moon', 'description': 'Tema escuro'},
-    {'value': 'auto', 'label': 'Automático', 'icon': 'bi-circle-half', 'description': 'Segue a preferência do sistema'},
-    {'value': 'blue', 'label': 'Azul', 'icon': 'bi-palette', 'description': 'Tema azul corporativo'},
-    {'value': 'green', 'label': 'Verde', 'icon': 'bi-palette', 'description': 'Tema verde natureza'},
+    #{'value': 'auto', 'label': 'Automático', 'icon': 'bi-circle-half', 'description': 'Segue a preferência do sistema'},
+    #{'value': 'blue', 'label': 'Azul', 'icon': 'bi-palette', 'description': 'Tema azul corporativo'},
+    #{'value': 'green', 'label': 'Verde', 'icon': 'bi-palette', 'description': 'Tema verde natureza'},
 ]
 
 def get_user_config():

@@ -311,83 +311,7 @@ class PmocAsset(db.Model):
         return f'<PmocAsset {self.pmoc_type}:{self.pmoc_id}>'
 
 
-class SoftwareGroup(db.Model):
-    __tablename__ = 'software_groups'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.Text)
-    is_required = db.Column(db.Boolean, default=True)  # Se o software é obrigatório ou opcional
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relacionamentos
-    group_software = db.relationship('SoftwareGroupItem', backref='group', lazy=True, cascade="all, delete-orphan")
-    group_assets = db.relationship('SoftwareGroupAsset', backref='group', lazy=True, cascade="all, delete-orphan")
-    
-    def __repr__(self):
-        return f'<SoftwareGroup {self.name}>'
 
-
-class SoftwareGroupItem(db.Model):
-    __tablename__ = 'software_group_items'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.Integer, db.ForeignKey('software_groups.id', ondelete='CASCADE'))
-    software_name = db.Column(db.String(255), nullable=False)
-    software_vendor = db.Column(db.String(255))
-    software_version = db.Column(db.String(100))
-    is_required = db.Column(db.Boolean, default=True)  # Se este software específico é obrigatório
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    __table_args__ = (db.UniqueConstraint('group_id', 'software_name', 'software_vendor', 'software_version', name='_group_software_uc'),)
-    
-    def __repr__(self):
-        return f'<SoftwareGroupItem {self.software_name}>'
-
-
-class SoftwareGroupAsset(db.Model):
-    __tablename__ = 'software_group_assets'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.Integer, db.ForeignKey('software_groups.id', ondelete='CASCADE'))
-    asset_id = db.Column(db.Integer, db.ForeignKey('assets.id', ondelete='CASCADE'))
-    assigned_at = db.Column(db.DateTime, default=datetime.utcnow)
-    assigned_by = db.Column(db.Integer, db.ForeignKey('users.id'))
-    
-    # Relacionamentos
-    asset = db.relationship('Asset', backref='software_groups')
-    assigned_user = db.relationship('User', backref='assigned_software_groups')
-    
-    __table_args__ = (db.UniqueConstraint('group_id', 'asset_id', name='_group_asset_uc'),)
-    
-    def __repr__(self):
-        return f'<SoftwareGroupAsset {self.group_id}-{self.asset_id}>'
-
-
-class SoftwareInstallationStatus(db.Model):
-    __tablename__ = 'software_installation_status'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    asset_id = db.Column(db.Integer, db.ForeignKey('assets.id', ondelete='CASCADE'))
-    software_name = db.Column(db.String(255), nullable=False)
-    software_vendor = db.Column(db.String(255))
-    software_version = db.Column(db.String(100))
-    action_type = db.Column(db.String(50), nullable=False)  # 'install', 'uninstall', 'update'
-    status = db.Column(db.String(50), default='pending')  # 'pending', 'in_progress', 'completed', 'failed', 'blocked'
-    error_message = db.Column(db.Text)
-    blocked_reason = db.Column(db.Text)  # Motivo do bloqueio se status = 'blocked'
-    scheduled_date = db.Column(db.DateTime)
-    started_at = db.Column(db.DateTime)
-    completed_at = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relacionamentos
-    asset = db.relationship('Asset', backref='software_installation_status')
-    
-    def __repr__(self):
-        return f'<SoftwareInstallationStatus {self.asset_id}-{self.software_name}>'
     
 class AssetGroup(db.Model):
     """Modelo para grupos de assets"""
@@ -469,3 +393,127 @@ class AssetGroupLog(db.Model):
     
     def __repr__(self):
         return f'<AssetGroupLog {self.action} for group_id={self.group_id}>'
+
+
+# Modelos para Gerenciamento de Software
+class SoftwareGroup(db.Model):
+    """Modelo para grupos de software"""
+    __tablename__ = 'software_groups'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    is_required = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relacionamentos
+    group_software = db.relationship('SoftwareGroupItem', backref='group', lazy=True, cascade="all, delete-orphan")
+    group_assets = db.relationship('SoftwareGroupAsset', backref='group', lazy=True, cascade="all, delete-orphan")
+    policies = db.relationship('SoftwarePolicy', backref='group', lazy=True, cascade="all, delete-orphan")
+    
+    def __repr__(self):
+        return f'<SoftwareGroup {self.name}>'
+
+
+class SoftwareGroupItem(db.Model):
+    """Modelo para itens de software nos grupos"""
+    __tablename__ = 'software_group_items'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('software_groups.id', ondelete='CASCADE'))
+    software_name = db.Column(db.String(255), nullable=False)
+    software_vendor = db.Column(db.String(255))
+    software_version = db.Column(db.String(100))
+    is_required = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (db.UniqueConstraint('group_id', 'software_name', 'software_vendor', 'software_version', name='_group_software_uc'),)
+    
+    def __repr__(self):
+        return f'<SoftwareGroupItem {self.software_name}>'
+
+
+class SoftwareGroupAsset(db.Model):
+    """Modelo para relacionamento entre grupos de software e assets"""
+    __tablename__ = 'software_group_assets'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('software_groups.id', ondelete='CASCADE'))
+    asset_id = db.Column(db.Integer, db.ForeignKey('assets.id', ondelete='CASCADE'))
+    assigned_at = db.Column(db.DateTime, default=datetime.utcnow)
+    assigned_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    
+    # Relacionamentos
+    asset = db.relationship('Asset', backref='software_groups')
+    assigned_user = db.relationship('User', backref='assigned_software_groups')
+    
+    __table_args__ = (db.UniqueConstraint('group_id', 'asset_id', name='_group_asset_uc'),)
+    
+    def __repr__(self):
+        return f'<SoftwareGroupAsset {self.group_id}-{self.asset_id}>'
+
+
+class SoftwareInstallationStatus(db.Model):
+    """Modelo para status de instalação de software"""
+    __tablename__ = 'software_installation_status'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    asset_id = db.Column(db.Integer, db.ForeignKey('assets.id', ondelete='CASCADE'))
+    software_name = db.Column(db.String(255), nullable=False)
+    software_vendor = db.Column(db.String(255))
+    software_version = db.Column(db.String(100))
+    action_type = db.Column(db.String(50), nullable=False)  # 'install', 'uninstall', 'update'
+    status = db.Column(db.String(50), default='pending')  # 'pending', 'in_progress', 'completed', 'failed', 'blocked'
+    error_message = db.Column(db.Text)
+    blocked_reason = db.Column(db.Text)
+    scheduled_date = db.Column(db.DateTime)
+    started_at = db.Column(db.DateTime)
+    completed_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relacionamentos
+    asset = db.relationship('Asset', backref='software_installation_status')
+    
+    def __repr__(self):
+        return f'<SoftwareInstallationStatus {self.asset_id}-{self.software_name}>'
+
+
+class SoftwarePolicy(db.Model):
+    """Modelo para políticas de software"""
+    __tablename__ = 'software_policies'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('software_groups.id', ondelete='CASCADE'))
+    policy_name = db.Column(db.String(255), nullable=False)
+    policy_type = db.Column(db.String(50), nullable=False)  # 'installation', 'uninstallation', 'update', 'blocking'
+    policy_value = db.Column(db.Text)
+    is_enabled = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<SoftwarePolicy {self.policy_name}>'
+
+
+class SoftwareExecutionLog(db.Model):
+    """Modelo para logs de execução de software"""
+    __tablename__ = 'software_execution_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    asset_id = db.Column(db.Integer, db.ForeignKey('assets.id', ondelete='CASCADE'))
+    software_name = db.Column(db.String(255), nullable=False)
+    action_type = db.Column(db.String(50), nullable=False)
+    execution_status = db.Column(db.String(50), nullable=False)  # 'success', 'failed', 'blocked'
+    execution_message = db.Column(db.Text)
+    execution_details = db.Column(db.JSON)
+    executed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    executed_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    
+    # Relacionamentos
+    asset = db.relationship('Asset', backref='software_execution_logs')
+    executed_user = db.relationship('User', backref='software_executions')
+    
+    def __repr__(self):
+        return f'<SoftwareExecutionLog {self.asset_id}-{self.software_name}>'

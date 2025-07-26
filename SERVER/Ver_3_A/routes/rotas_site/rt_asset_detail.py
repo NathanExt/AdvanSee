@@ -69,14 +69,9 @@ def dados_asset(asset_id):
 def dados_user(asset_id):
     asset = Asset.query.get_or_404(asset_id)
     print(asset.logged_user.split('>')[1])
-    user_data = search_ad_user(asset.logged_user.split('>')[1])
-    
-    if user_data:
-        print(user_data['display_name'])
-        return user_data
-    else:
-        print("Usuário não encontrado no AD")
-        return None
+    name = search_ad_user(asset.logged_user.split('>')[1])
+    print(name['display_name'])
+    #return search_ad_user(asset_id)
 
 
 
@@ -266,7 +261,3 @@ def delete_asset(asset_id):
         return redirect(url_for('asset_detail.asset_detail', asset_id=asset_id))
 
 
-@bp_asset_detail.route('/asset/<int:asset_id>/active_events', methods=['POST'])
-def active_events(asset_id):
-    print("HABILITAR EVENTOS")
-    pass

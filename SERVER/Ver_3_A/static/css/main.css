@@ -31,6 +31,7 @@ body {
     transition: all 0.3s ease;
 }
 
+
 .btn-info{
     background-color: var(--secondary-color);
 }

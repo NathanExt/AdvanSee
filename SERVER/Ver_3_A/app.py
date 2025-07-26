@@ -6,12 +6,13 @@ import os, logging, sys
 from flask import Flask, render_template
 from models.database import db, Organization, User, Asset, Vulnerability
 from config import CONFIG
-from routes.rotas_site import rt_config, rt_assets, rt_asset_categories, rt_asset_detail, rt_organizations, rt_vulnerabilities, rt_patches, rt_software, rt_vendors, rt_locations, rt_users, rt_pmoc, rt_asset_vulnerabilidades, rt_pmoc_search
+from routes.rotas_site import rt_config, rt_assets, rt_asset_categories, rt_asset_detail, rt_organizations, rt_vulnerabilities, rt_patches, rt_software, rt_vendors, rt_locations, rt_users, rt_pmoc, rt_asset_vulnerabilidades, rt_pmoc_search, rt_software_groups
 from routes.rotas_agente import rt_agente_checkin
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 CAMINHO_PASTA_RAIZ = CONFIG.CAMINHO_LOG
+
 
 
 app = Flask(__name__,
@@ -50,6 +51,7 @@ app.register_blueprint(rt_pmoc.bp_pmoc)
 app.register_blueprint(rt_asset_vulnerabilidades.bp_asset_vulnerabilidades)
 app.register_blueprint(rt_pmoc_search.bp_pmoc_search)
 app.register_blueprint(rt_config.bp_config)
+app.register_blueprint(rt_software_groups.bp_software_groups)
 
 @app.route('/')
 def index():

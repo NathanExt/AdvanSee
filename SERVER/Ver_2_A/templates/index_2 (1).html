@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Dashboard</h1>
+
+<div class="row">
+    <!--<div class="col-md-3 mb-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Organizações</h5>
+                <p class="card-text display-4">{{ organization_count }}</p>
+            </div>
+        </div>
+    </div>-->
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Usuários</h5>
+                <p class="card-text display-4">{{ user_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Assets</h5>
+                <p class="card-text display-4">{{ asset_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">Vulnerabilidades</h5>
+                <p class="card-text display-4">{{ vulnerability_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Assets por Status
+            </div>
+            <div class="card-body">
+                <canvas id="assetsStatusChart"
+                        data-labels="{{ chart_labels | tojson }}"
+                        data-values="{{ chart_values | tojson }}">
+                </canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                Atividades Recentes
+            </div>
+            <div class="card-body">
+                <p>--</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

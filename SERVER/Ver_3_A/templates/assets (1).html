@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4"><i class="bi bi-pc-display"></i> Assets</h1>
+    <!-- Estatísticas Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Total de Assets</h5>
+                        <h2 class="card-text">{{ total_assets }}</h2>
+                        <small>Equipamentos cadastrados</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Assets Online</h5>
+                        <h2 class="card-text">{{ assets_online }}</h2>
+                        <small>Equipamentos ativos</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Assets Offline</h5>
+                        <h2 class="card-text">{{ assets_offline }}</h2>
+                        <small>Equipamentos inativos</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">     
+                        <h5 class="card-title">Cobertura PMOC</h5>
+                        <h2 class="card-text">{{ "{:.1f}%".format((assets_found_in_pmoc / total_assets * 100) if total_assets > 0 else 0) }}</h2>
+                        <small>Assets com dados PMOC</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="assetsNavTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="assets-list-tab" data-bs-toggle="tab" data-bs-target="#assets-list" type="button" role="tab">
+                <i class="bi bi-list-ul"></i> Lista
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="asset-groups-tab" data-bs-toggle="tab" data-bs-target="#asset-groups" type="button" role="tab">
+                <i class="bi bi-collection"></i> Grupos
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="scripts-tab" data-bs-toggle="tab" data-bs-target="#scripts" type="button" role="tab">
+                <i class="bi bi-code-slash"></i> Scripts
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="assetsTabContent">
+        <!-- Dashboard Tab -->
+        <div class="tab-pane fade show active" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+            
+
+            <!-- Gráficos Dashboard -->
+            <div class="row">
+                <!-- Gráfico de Status -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-pie-chart"></i> Status dos Assets</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="statusChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Sistemas Operacionais -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-windows"></i> Sistemas Operacionais</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="osChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Fabricantes -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-building"></i> Top 10 Fabricantes</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="manufacturersChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Modelos -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-laptop"></i> Top 10 Modelos</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="modelsChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Assets por Departamento -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-diagram-3"></i> Assets por Departamento</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="departmentChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Idade dos Equipamentos -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-calendar3"></i> Idade dos Equipamentos</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="ageChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assets List Tab -->
+        <div class="tab-pane fade" id="assets-list" role="tabpanel" aria-labelledby="assets-list-tab">
+            <!-- Filtros de Busca -->
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-search"></i> Buscar Assets</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="searchForm">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="search_name">Nome/Tag:</label>
+                                        <input type="text" id="search_name" name="search_name" class="form-control" 
+                                               value="{{ search_name }}" placeholder="Nome ou Asset Tag">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="search_manufacturer">Fabricante:</label>
+                                        <select id="search_manufacturer" name="search_manufacturer" class="form-control">
+                                            <option value="">Todos</option>
+                                            {% for manufacturer in manufacturers %}
+                                            <option value="{{ manufacturer }}" {% if search_manufacturer == manufacturer %}selected{% endif %}>
+                                                {{ manufacturer }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="search_model">Modelo:</label>
+                                        <select id="search_model" name="search_model" class="form-control">
+                                            <option value="">Todos</option>
+                                            {% for model in models %}
+                                            <option value="{{ model }}" {% if search_model == model %}selected{% endif %}>
+                                                {{ model }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="search_user">Usuário:</label>
+                                        <input type="text" id="search_user" name="search_user" class="form-control" 
+                                               value="{{ search_user }}" placeholder="Usuário logado">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="search_status">Status:</label>
+                                        <select id="search_status" name="search_status" class="form-control">
+                                            <option value="">Todos</option>
+                                            {% for status in statuses %}
+                                            <option value="{{ status }}" {% if search_status == status %}selected{% endif %}>
+                                                {{ status }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label>&nbsp;</label>
+                                        <div>
+                                            <button type="button" class="btn btn-primary btn-block" onclick="performSearch()">
+                                                <i class="bi bi-search"></i> Buscar
+                                            </button>
+                                            <button type="button" class="btn btn-secondary btn-block mt-1" onclick="clearSearch()">
+                                                <i class="bi bi-x"></i> Limpar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Área de Loading -->
+            <div id="loadingArea" class="d-none">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Carregando...</span>
+                    </div>
+                    <p class="mt-2">Buscando assets...</p>
+                </div>
+            </div>
+
+            <!-- Lista de Assets -->
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5>Lista de Assets (<span id="assetsCount">{{ assets|length }}</span> resultados)</h5>
+                            <button class="btn btn-sm btn-outline-primary" onclick="exportAssetsToCSV()">
+                                <i class="bi bi-download"></i> Exportar CSV
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="assetsTable">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Asset Tag</th>
+                                            <th>Nome</th>
+                                            <th>Modelo</th>
+                                            <th>Marca</th>
+                                            <th>Usuário</th>
+                                            <th>Status</th>
+                                            <th>PMOC</th>
+                                            <th>Detalhes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="assetsTableBody">
+                                        {% for asset in assets %}
+                                        <tr>
+                                            <td>{{ asset.id }}</td>
+                                            <td>{{ asset.asset_tag }}</td>
+                                            <td>{{ asset.name }}</td>
+                                            <td>{{ asset.computer_model if asset.computer_model else 'N/A' }}</td>
+                                            <td>{{ asset.computer_manufacturer if asset.computer_manufacturer else 'N/A' }}</td>
+                                            <td>{{ asset.logged_user if asset.logged_user else 'N/A' }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ 'success' if asset.status == 'active' else 'warning' if asset.status == 'inactive' else 'secondary' }}">
+                                                    {{ asset.status }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if asset.pmoc_assets %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check"></i> Sincronizado
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">
+                                                        <i class="bi bi-x"></i> Não encontrado
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('asset_detail.asset_detail', asset_id=asset.id) }}" class="btn btn-sm btn-info">
+                                                    <i class="bi bi-eye"></i> Detalhes
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="9" class="text-center text-muted">
+                                                <i class="bi bi-info-circle"></i> Nenhum asset encontrado.
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asset Groups Tab -->
+        <div class="tab-pane fade" id="asset-groups" role="tabpanel" aria-labelledby="asset-groups-tab">
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4><i class="bi bi-collection"></i> Gerenciamento de Grupos de Assets</h4>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAssetGroupModal">
+                            <i class="bi bi-plus-circle"></i> Criar Novo Grupo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Grupos -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-list-nested"></i> Grupos de Assets</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if asset_groups %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nome</th>
+                                            <th>Descrição</th>
+                                            <th>Assets</th>
+                                            <th>Criado em</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for group in asset_groups %}
+                                        <tr>
+                                            <td>{{ group.id }}</td>
+                                            <td><strong>{{ group.name }}</strong></td>
+                                            <td>{{ group.description or 'N/A' }}</td>
+                                            <td><span class="badge bg-info">{{ group.assets|length }}</span></td>
+                                            <td>{{ group.created_at.strftime('%d/%m/%Y %H:%M') if group.created_at else 'N/A' }}</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="viewAssetGroupDetails({{ group.id }})" title="Ver Detalhes">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-warning" onclick="editAssetGroup({{ group.id }})" title="Editar">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAssetGroup({{ group.id }})" title="Excluir">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-collection-x" style="font-size: 4rem; color: #ccc;"></i>
+                                <h5 class="mt-3 text-muted">Nenhum grupo de assets criado ainda</h5>
+                                <p class="text-muted">Clique no botão "Criar Novo Grupo" para começar</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scripts Tab -->
+        <div class="tab-pane fade" id="scripts" role="tabpanel" aria-labelledby="scripts-tab">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="bi bi-code-slash"></i> Scripts de Automação</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center py-5">
+                                <i class="bi bi-tools" style="font-size: 4rem; color: #ccc;"></i>
+                                <h5 class="mt-3 text-muted">Funcionalidade em Desenvolvimento</h5>
+                                <p class="text-muted">A funcionalidade de scripts será implementada em breve.</p>
+                                <p class="text-muted">Aqui você poderá criar e gerenciar scripts para automação de tarefas em assets.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Criar Grupo de Assets -->
+<div class="modal fade" id="createAssetGroupModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Criar Novo Grupo de Assets</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createAssetGroupForm">
+                    <input type="hidden" name="action" value="create_group">
+                    
+                    <div class="mb-3">
+                        <label for="group_name" class="form-label">Nome do Grupo *</label>
+                        <input type="text" class="form-control" id="group_name" name="name" required 
+                               placeholder="Digite um nome para o grupo">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="group_description" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="group_description" name="description" rows="3"
+                                  placeholder="Digite uma descrição para o grupo"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Selecionar Assets</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control mb-2" id="asset_search_modal" 
+                                       placeholder="Buscar assets..." onkeyup="searchAssetsForGroup()">
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-outline-primary" onclick="selectAllAssetsForGroup()">
+                                    <i class="bi bi-check-all"></i> Selecionar Todos
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearAssetSelection()">
+                                    <i class="bi bi-x-circle"></i> Limpar Seleção
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="border rounded p-2 mt-2" style="max-height: 300px; overflow-y: auto;">
+                            <div id="available_assets_list">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm"></div>
+                                    <p class="mt-2">Carregando assets...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <strong>Assets Selecionados: <span id="selected_assets_count">0</span></strong>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" id="selected_assets_input" name="selected_assets">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="createAssetGroup()">
+                    <i class="bi bi-check-circle"></i> Criar Grupo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Detalhes do Grupo -->
+<div class="modal fade" id="assetGroupDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes do Grupo de Assets</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="assetGroupDetailsContent">
+                <!-- Conteúdo será carregado via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Passar dados do template para o JavaScript
+window.chartData = {{ chart_data|tojson|safe }};
+</script>
+<script src="{{ url_for('static', filename='js/assets.js') }}"></script>
+<script>
+// Inicializar a página quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof window.initializeAssetsPageFromTemplate === 'function') {
+        window.initializeAssetsPageFromTemplate(window.chartData);
+    } else {
+        console.error('Função initializeAssetsPageFromTemplate não encontrada');
+    }
+});
+</script>
+{% endblock %}

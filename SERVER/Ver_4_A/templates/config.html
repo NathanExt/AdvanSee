@@ -1,0 +1,610 @@
+{% extends "base.html" %}
+
+{% block title %}Configurações - Ambiente ISAC{% endblock %}
+
+{% block extra_css %}
+<style>
+    .config-section {
+        background: var(--background-color);
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .config-header {
+        background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+        color: white;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .config-body {
+        padding: 2rem;
+    }
+    
+    .config-item {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .config-item:hover {
+        border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    }
+    
+    .config-item label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .config-item .form-select,
+    .config-item .form-control {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        transition: border-color 0.3s ease;
+    }
+    
+    .config-item .form-select:focus,
+    .config-item .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .timezone-preview {
+        background: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+    
+    .theme-option {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .theme-option:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+    }
+    
+    .theme-option.selected {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+    
+    .theme-option i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .language-option {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .language-option:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .language-option.selected {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+    
+    .language-flag {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    .btn-reset {
+        background: #6c757d;
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-reset:hover {
+        background: #5a6268;
+        color: white;
+    }
+    
+    .config-actions {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-top: 1px solid #e9ecef;
+        text-align: center;
+    }
+    
+    .preview-box {
+        background: #e9ecef;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    
+    .current-config {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+    }
+    
+    .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .config-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="bi bi-gear-fill text-primary"></i>
+                Configurações do Sistema
+            </h1>
+            <p class="text-muted mb-0">Personalize sua experiência no Ambiente ISAC</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary" onclick="resetConfig()">
+                <i class="bi bi-arrow-clockwise"></i>
+                Restaurar Padrão
+            </button>
+            <button type="button" class="btn btn-primary" onclick="saveConfig()">
+                <i class="bi bi-check-lg"></i>
+                Salvar Configurações
+            </button>
+        </div>
+    </div>
+
+    <!-- Configuração Atual -->
+    <div class="current-config">
+        <h6 class="mb-2">
+            <i class="bi bi-info-circle"></i>
+            Configuração Atual
+        </h6>
+        <div class="row">
+            <div class="col-md-3">
+                <strong>Fuso Horário:</strong> 
+                <span id="current-timezone">{{ user_config.timezone }}</span>
+            </div>
+            <div class="col-md-3">
+                <strong>Idioma:</strong> 
+                <span id="current-language">{{ user_config.language }}</span>
+            </div>
+            <div class="col-md-3">
+                <strong>Tema:</strong> 
+                <span id="current-theme">{{ user_config.theme }}</span>
+            </div>
+            <div class="col-md-3">
+                <strong>Formato:</strong> 
+                <span id="current-format">{{ user_config.date_format }} / {{ user_config.time_format }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configurações -->
+    <div class="config-grid">
+        <!-- Fuso Horário -->
+        <div class="config-section">
+            <div class="config-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock"></i>
+                    Fuso Horário
+                </h5>
+                <small>Configure o fuso horário para exibição de datas e horários</small>
+            </div>
+            <div class="config-body">
+                <div class="config-item">
+                    <label for="timezone-select">
+                        <i class="bi bi-globe"></i>
+                        Selecione o Fuso Horário
+                    </label>
+                    <select class="form-select" id="timezone-select" onchange="previewTimezone(this.value)">
+                        {% for tz in timezones %}
+                        <option value="{{ tz.value }}" {% if tz.value == user_config.timezone %}selected{% endif %}>
+                            {{ tz.label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="timezone-preview" id="timezone-preview">
+                        <i class="bi bi-clock"></i>
+                        Hora atual: {{ current_times.get(user_config.timezone, '--:--:--') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Idioma -->
+        <div class="config-section">
+            <div class="config-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-translate"></i>
+                    Idioma
+                </h5>
+                <small>Escolha o idioma de interface do sistema</small>
+            </div>
+            <div class="config-body">
+                <div class="config-item">
+                    <label>
+                        <i class="bi bi-flag"></i>
+                        Selecione o Idioma
+                    </label>
+                    <div id="language-options">
+                        {% for lang in languages %}
+                        <div class="language-option {% if lang.value == user_config.language %}selected{% endif %}" 
+                             onclick="selectLanguage('{{ lang.value }}')">
+                            <span class="language-flag">{{ lang.flag }}</span>
+                            <div>
+                                <div class="fw-bold">{{ lang.label }}</div>
+                                <small class="text-muted">{{ lang.value }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" id="selected-language" value="{{ user_config.language }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Tema -->
+        <div class="config-section">
+            <div class="config-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-palette"></i>
+                    Tema Visual
+                </h5>
+                <small>Personalize a aparência da interface</small>
+            </div>
+            <div class="config-body">
+                <div class="config-item">
+                    <label>
+                        <i class="bi bi-brush"></i>
+                        Selecione o Tema
+                    </label>
+                    <div class="row" id="theme-options">
+                        {% for theme in themes %}
+                        <div class="col-md-6">
+                            <div class="theme-option {% if theme.value == user_config.theme %}selected{% endif %}" 
+                                 onclick="selectTheme('{{ theme.value }}')">
+                                <i class="bi {{ theme.icon }}"></i>
+                                <div class="fw-bold">{{ theme.label }}</div>
+                                <small class="text-muted">{{ theme.description }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" id="selected-theme" value="{{ user_config.theme }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Formato de Data e Hora -->
+        <div class="config-section">
+            <div class="config-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar3"></i>
+                    Formato de Data e Hora
+                </h5>
+                <small>Configure como as datas e horários são exibidos</small>
+            </div>
+            <div class="config-body">
+                <div class="config-item">
+                    <label for="date-format">
+                        <i class="bi bi-calendar-date"></i>
+                        Formato de Data
+                    </label>
+                    <select class="form-select" id="date-format">
+                        <option value="DD/MM/YYYY" {% if user_config.date_format == 'DD/MM/YYYY' %}selected{% endif %}>DD/MM/YYYY (31/12/2024)</option>
+                        <option value="MM/DD/YYYY" {% if user_config.date_format == 'MM/DD/YYYY' %}selected{% endif %}>MM/DD/YYYY (12/31/2024)</option>
+                        <option value="YYYY-MM-DD" {% if user_config.date_format == 'YYYY-MM-DD' %}selected{% endif %}>YYYY-MM-DD (2024-12-31)</option>
+                        <option value="DD-MM-YYYY" {% if user_config.date_format == 'DD-MM-YYYY' %}selected{% endif %}>DD-MM-YYYY (31-12-2024)</option>
+                    </select>
+                </div>
+                
+                <div class="config-item">
+                    <label for="time-format">
+                        <i class="bi bi-clock"></i>
+                        Formato de Hora
+                    </label>
+                    <select class="form-select" id="time-format">
+                        <option value="24h" {% if user_config.time_format == '24h' %}selected{% endif %}>24 horas (14:30)</option>
+                        <option value="12h" {% if user_config.time_format == '12h' %}selected{% endif %}>12 horas (2:30 PM)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="config-section">
+        <div class="config-header">
+            <h5 class="mb-0">
+                <i class="bi bi-eye"></i>
+                Preview das Configurações
+            </h5>
+            <small>Veja como suas configurações serão aplicadas</small>
+        </div>
+        <div class="config-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Exemplo de Data e Hora:</h6>
+                    <div class="preview-box" id="datetime-preview">
+                        Data: 31/12/2024<br>
+                        Hora: 14:30:25
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6>Configurações Selecionadas:</h6>
+                    <div class="preview-box" id="config-preview">
+                        Fuso: {{ user_config.timezone }}<br>
+                        Idioma: {{ user_config.language }}<br>
+                        Tema: {{ user_config.theme }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Variáveis globais
+let currentConfig = {
+    timezone: '{{ user_config.timezone }}',
+    language: '{{ user_config.language }}',
+    theme: '{{ user_config.theme }}',
+    date_format: '{{ user_config.date_format }}',
+    time_format: '{{ user_config.time_format }}'
+};
+
+// Função para selecionar idioma
+function selectLanguage(language) {
+    // Remover seleção anterior
+    document.querySelectorAll('.language-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Selecionar nova opção
+    event.target.closest('.language-option').classList.add('selected');
+    document.getElementById('selected-language').value = language;
+    currentConfig.language = language;
+    
+    updatePreview();
+}
+
+// Função para selecionar tema
+function selectTheme(theme) {
+    // Remover seleção anterior
+    document.querySelectorAll('.theme-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Selecionar nova opção
+    event.target.closest('.theme-option').classList.add('selected');
+    document.getElementById('selected-theme').value = theme;
+    currentConfig.theme = theme;
+    
+    updatePreview();
+}
+
+// Função para preview do fuso horário
+function previewTimezone(timezone) {
+    currentConfig.timezone = timezone;
+    
+    // Fazer requisição para obter hora atual
+    fetch(`/config/preview/timezone/${timezone}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('timezone-preview').innerHTML = 
+                    `<i class="bi bi-clock"></i> ${data.preview}`;
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao obter preview:', error);
+        });
+    
+    updatePreview();
+}
+
+// Função para atualizar preview
+function updatePreview() {
+    // Atualizar preview de configurações
+    document.getElementById('config-preview').innerHTML = 
+        `Fuso: ${currentConfig.timezone}<br>` +
+        `Idioma: ${currentConfig.language}<br>` +
+        `Tema: ${currentConfig.theme}`;
+    
+    // Atualizar preview de data/hora
+    const dateFormat = document.getElementById('date-format').value;
+    const timeFormat = document.getElementById('time-format').value;
+    
+    let dateExample = '31/12/2024';
+    let timeExample = '14:30:25';
+    
+    if (dateFormat === 'MM/DD/YYYY') dateExample = '12/31/2024';
+    else if (dateFormat === 'YYYY-MM-DD') dateExample = '2024-12-31';
+    else if (dateFormat === 'DD-MM-YYYY') dateExample = '31-12-2024';
+    
+    if (timeFormat === '12h') timeExample = '2:30:25 PM';
+    
+    document.getElementById('datetime-preview').innerHTML = 
+        `Data: ${dateExample}<br>Hora: ${timeExample}`;
+}
+
+// Função para salvar configurações
+function saveConfig() {
+    // Coletar valores dos campos
+    currentConfig.timezone = document.getElementById('timezone-select').value;
+    currentConfig.language = document.getElementById('selected-language').value;
+    currentConfig.theme = document.getElementById('selected-theme').value;
+    currentConfig.date_format = document.getElementById('date-format').value;
+    currentConfig.time_format = document.getElementById('time-format').value;
+    
+    // Mostrar loading
+    const saveBtn = document.querySelector('.btn-primary');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Salvando...';
+    saveBtn.disabled = true;
+    
+    // Enviar configurações
+    fetch('/config/save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(currentConfig)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar sucesso
+            showNotification('success', data.message);
+            
+            // Atualizar configuração atual
+            document.getElementById('current-timezone').textContent = currentConfig.timezone;
+            document.getElementById('current-language').textContent = currentConfig.language;
+            document.getElementById('current-theme').textContent = currentConfig.theme;
+            document.getElementById('current-format').textContent = 
+                `${currentConfig.date_format} / ${currentConfig.time_format}`;
+        } else {
+            showNotification('error', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao salvar:', error);
+        showNotification('error', 'Erro ao salvar configurações');
+    })
+    .finally(() => {
+        // Restaurar botão
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
+    });
+}
+
+// Função para resetar configurações
+function resetConfig() {
+    if (confirm('Tem certeza que deseja restaurar as configurações padrão?')) {
+        // Mostrar loading
+        const resetBtn = document.querySelector('.btn-outline-secondary');
+        const originalText = resetBtn.innerHTML;
+        resetBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Restaurando...';
+        resetBtn.disabled = true;
+        
+        fetch('/config/reset', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('success', data.message);
+                // Recarregar página para aplicar configurações padrão
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                showNotification('error', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao resetar:', error);
+            showNotification('error', 'Erro ao resetar configurações');
+        })
+        .finally(() => {
+            // Restaurar botão
+            resetBtn.innerHTML = originalText;
+            resetBtn.disabled = false;
+        });
+    }
+}
+
+// Função para mostrar notificações
+function showNotification(type, message) {
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+    
+    const alert = document.createElement('div');
+    alert.className = `alert ${alertClass} alert-dismissible fade show`;
+    alert.innerHTML = `
+        <i class="bi ${icon}"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Inserir no início do container
+    const container = document.querySelector('.container-fluid');
+    container.insertBefore(alert, container.firstChild);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        if (alert.parentNode) {
+            alert.remove();
+        }
+    }, 5000);
+}
+
+// Inicializar preview ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+    updatePreview();
+    
+    // Adicionar listeners para formatos
+    document.getElementById('date-format').addEventListener('change', updatePreview);
+    document.getElementById('time-format').addEventListener('change', updatePreview);
+});
+</script>
+{% endblock %}

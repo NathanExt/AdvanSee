@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}{{ group.name }} - Detalhes do Grupo{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho do Grupo -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="card-title mb-0">
+                            <i class="bi bi-collection"></i> {{ group.name }}
+                        </h4>
+                        <small class="text-muted">ID: {{ group.id }} | Criado em: {{ group.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('software_groups.edit_software_group', group_id=group.id) }}" 
+                           class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <button type="button" class="btn btn-danger" onclick="deleteGroup({{ group.id }})">
+                            <i class="bi bi-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6>Descrição</h6>
+                            <p>{{ group.description or 'Sem descrição' }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between">
+                                <span><strong>Obrigatório:</strong></span>
+                                {% if group.is_required %}
+                                <span class="badge bg-success">Sim</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Não</span>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span><strong>Software:</strong></span>
+                                <span class="badge bg-info">{{ group.group_software|length }} item(s)</span>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span><strong>Assets:</strong></span>
+                                <span class="badge bg-warning">{{ group.group_assets|length }} asset(s)</span>
+                            </div>
+                            <div class="d-flex justify-content-between mt-2">
+                                <span><strong>Políticas:</strong></span>
+                                <span class="badge bg-primary">{{ group.policies|length }} política(s)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Software do Grupo -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-box"></i> Software do Grupo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if group.group_software %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Fabricante</th>
+                                    <th>Versão</th>
+                                    <th>Obrigatório</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for software in group.group_software %}
+                                <tr>
+                                    <td><strong>{{ software.software_name }}</strong></td>
+                                    <td>{{ software.software_vendor or '-' }}</td>
+                                    <td>{{ software.software_version or 'latest' }}</td>
+                                    <td>
+                                        {% if software.is_required %}
+                                        <span class="badge bg-success">Sim</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Não</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-box display-4 text-muted"></i>
+                        <p class="text-muted mt-2">Nenhum software adicionado a este grupo</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Assets Atribuídos -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-pc-display"></i> Assets Atribuídos
+                    </h5>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="assignAssets()">
+                        <i class="bi bi-plus-circle"></i> Atribuir Assets
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if group.group_assets %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Asset</th>
+                                    <th>Tag</th>
+                                    <th>Sistema</th>
+                                    <th>Atribuído em</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asset_group in group.group_assets %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('asset_detail.asset_detail', asset_id=asset_group.asset.id) }}">
+                                            {{ asset_group.asset.name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ asset_group.asset.asset_tag }}</td>
+                                    <td>{{ asset_group.asset.operating_system or '-' }}</td>
+                                    <td>{{ asset_group.assigned_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-pc-display display-4 text-muted"></i>
+                        <p class="text-muted mt-2">Nenhum asset atribuído a este grupo</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Políticas do Grupo -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-shield-check"></i> Políticas do Grupo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if group.policies %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Tipo</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Criado em</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for policy in group.policies %}
+                                <tr>
+                                    <td><strong>{{ policy.policy_name }}</strong></td>
+                                    <td>
+                                        <span class="badge bg-info">{{ policy.policy_type }}</span>
+                                    </td>
+                                    <td>
+                                        <code class="small">{{ policy.policy_value }}</code>
+                                    </td>
+                                    <td>
+                                        {% if policy.is_enabled %}
+                                        <span class="badge bg-success">Ativa</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Inativa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ policy.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-shield-check display-4 text-muted"></i>
+                        <p class="text-muted mt-2">Nenhuma política configurada para este grupo</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning"></i> Ações Rápidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <button type="button" class="btn btn-outline-primary w-100" onclick="analyzeCompliance()">
+                                <i class="bi bi-graph-up"></i> Analisar Conformidade
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <button type="button" class="btn btn-outline-success w-100" onclick="scheduleInstallations()">
+                                <i class="bi bi-calendar-plus"></i> Agendar Instalações
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <button type="button" class="btn btn-outline-warning w-100" onclick="executeTasks()">
+                                <i class="bi bi-play-circle"></i> Executar Tarefas
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('software_groups.software_execution_logs') }}" class="btn btn-outline-info w-100">
+                                <i class="bi bi-list-ul"></i> Ver Logs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Atribuir Assets -->
+<div class="modal fade" id="assignAssetsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Atribuir Assets ao Grupo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="assetSearch" class="form-label">Buscar Assets</label>
+                    <input type="text" class="form-control" id="assetSearch" placeholder="Digite o nome ou tag do asset...">
+                </div>
+                <div id="assetsList" class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Lista de assets será carregada aqui -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveAssetAssignments()">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteGroup(groupId) {
+    if (confirm('Tem certeza que deseja excluir este grupo de software? Esta ação não pode ser desfeita.')) {
+        fetch(`/software-groups/${groupId}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => {
+                    window.location.href = '/software-groups';
+                }, 1500);
+            } else {
+                showAlert('error', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            showAlert('error', 'Erro ao excluir grupo de software');
+        });
+    }
+}
+
+function assignAssets() {
+    // Carregar lista de assets disponíveis
+    fetch('/api/assets')
+        .then(response => response.json())
+        .then(data => {
+            const assetsList = document.getElementById('assetsList');
+            assetsList.innerHTML = '';
+            
+            data.assets.forEach(asset => {
+                const div = document.createElement('div');
+                div.className = 'form-check';
+                div.innerHTML = `
+                    <input class="form-check-input" type="checkbox" value="${asset.id}" id="asset_${asset.id}">
+                    <label class="form-check-label" for="asset_${asset.id}">
+                        <strong>${asset.name}</strong> (${asset.asset_tag}) - ${asset.operating_system || 'Sistema não identificado'}
+                    </label>
+                `;
+                assetsList.appendChild(div);
+            });
+            
+            // Mostrar modal
+            new bootstrap.Modal(document.getElementById('assignAssetsModal')).show();
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            showAlert('error', 'Erro ao carregar lista de assets');
+        });
+}
+
+function saveAssetAssignments() {
+    const selectedAssets = Array.from(document.querySelectorAll('#assetsList input:checked'))
+        .map(input => parseInt(input.value));
+    
+    if (selectedAssets.length === 0) {
+        showAlert('warning', 'Selecione pelo menos um asset');
+        return;
+    }
+    
+    fetch(`/software-groups/{{ group.id }}/assign-assets`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            asset_ids: selectedAssets
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            showAlert('error', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('error', 'Erro ao atribuir assets');
+    });
+}
+
+function analyzeCompliance() {
+    // Redirecionar para análise de conformidade
+    window.location.href = `/software-groups/{{ group.id }}/compliance`;
+}
+
+function scheduleInstallations() {
+    // Implementar agendamento de instalações
+    showAlert('info', 'Funcionalidade de agendamento será implementada em breve');
+}
+
+function executeTasks() {
+    // Implementar execução de tarefas
+    showAlert('info', 'Funcionalidade de execução será implementada em breve');
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container-fluid');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+
+// Busca de assets no modal
+document.getElementById('assetSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const checkboxes = document.querySelectorAll('#assetsList .form-check');
+    
+    checkboxes.forEach(checkbox => {
+        const label = checkbox.querySelector('label');
+        const text = label.textContent.toLowerCase();
+        
+        if (text.includes(searchTerm)) {
+            checkbox.style.display = 'block';
+        } else {
+            checkbox.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %} 

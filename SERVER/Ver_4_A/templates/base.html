@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ambiente ISAC{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/themes.css') }}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header" id="sidebarHeader">
+            <h4><i class="bi bi-shield-check"></i> <span>Ambiente ISAC</span></h4>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="{{ url_for('index') }}" class="nav-link" id="navHome">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="{{ url_for('assets.assets') }}" class="nav-link" id="navAssets">
+                    <i class="bi bi-pc-display"></i>
+                    <span>Assets</span>
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="{{ url_for('software.software') }}" class="nav-link" id="navSoftware">
+                    <i class="bi bi-box"></i>
+                    <span>Software</span>
+                </a>
+            </div>
+            <!--
+            <div class="nav-item">
+                <a href="{{ url_for('vulnerabilities.vulnerabilities') }}" class="nav-link" id="navVulnerabilities">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span>Vulnerabilidades</span>
+                </a>
+            </div>-->
+            <!--
+            <div class="nav-item">
+                <a href="{{ url_for('patches.patches') }}" class="nav-link" id="navPatches">
+                    <i class="bi bi-patch-check"></i>
+                    <span>Patches</span>
+                </a>
+            </div>-->
+            
+            <!--<div class="nav-item">
+                <a href="{{ url_for('pmoc.pmoc') }}" class="nav-link" id="navPmoc">
+                    <i class="bi bi-database"></i>
+                    <span>PMOC</span>
+                </a>
+            </div>-->
+            <!--
+            <div class="nav-item">
+                <a href="{{ url_for('users.users') }}" class="nav-link" id="navUsers">
+                    <i class="bi bi-people"></i>
+                    <span>Usuários</span>
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="{{ url_for('organizations.organizations') }}" class="nav-link" id="navOrganizations">
+                    <i class="bi bi-building"></i>
+                    <span>Organizações</span>
+                </a>
+            </div>-->
+            <!--
+            <div class="nav-item">
+                <a href="{{ url_for('vendors.vendors') }}" class="nav-link" id="navVendors">
+                    <i class="bi bi-shop"></i>
+                    <span>Fornecedores</span>
+                </a>
+            </div>-->
+            
+            <!--<div class="nav-item">
+                <a href="{{ url_for('locations.locations') }}" class="nav-link" id="navLocations">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>Localizações</span>
+                </a>
+            </div>-->
+            
+            <!--<div class="nav-item">
+                <a href="{{ url_for('asset_categories.asset_categories') }}" class="nav-link" id="navCategories">
+                    <i class="bi bi-tags"></i>
+                    <span>Categorias</span>
+                </a>
+            </div>-->
+            
+            <div class="nav-item">
+                <a href="{{ url_for('config.config') }}" class="nav-link" id="navConfig">
+                    <i class="bi bi-gear"></i>
+                    <span>Configuração</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Sidebar Toggle Button --><!--
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="bi bi-list"></i>
+    </button>-->
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Navbar --><!--
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ url_for('index') }}">
+                    <i class="bi bi-shield-check"></i> Ambiente ISAC
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>-->
+
+        <!-- Page Content -->
+        <!--<div class="container-fluid mt-4">-->
+            <!-- Flash Messages --><!--
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
+                            <i class="bi bi-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }}"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            -->
+            <!-- Page Content -->
+            {% block content %}{% endblock %}
+        </div>-->
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="container">
+                <p class="mb-0">
+                    <i class="bi bi-shield-check"></i> 
+                    Ambiente ISAC
+                </p>
+                <small>Ambiente de Serviços Gerais - ISAC</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/themes.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

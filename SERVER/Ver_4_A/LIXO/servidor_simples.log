@@ -1,0 +1,25 @@
+2025-07-14 20:06:03,979 - INFO - Iniciando servidor simples na porta 5000
+2025-07-14 20:06:04,071 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.3:5000
+2025-07-14 20:06:04,072 - INFO - [33mPress CTRL+C to quit[0m
+2025-07-14 20:06:04,075 - INFO -  * Restarting with stat
+2025-07-14 20:06:04,796 - INFO - Iniciando servidor simples na porta 5000
+2025-07-14 20:06:04,841 - WARNING -  * Debugger is active!
+2025-07-14 20:06:04,867 - INFO -  * Debugger PIN: 835-166-984
+2025-07-14 20:06:05,872 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:05] "[33mGET /asset/1 HTTP/1.1[0m" 404 -
+2025-07-14 20:06:07,459 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:07] "GET / HTTP/1.1" 200 -
+2025-07-14 20:06:07,520 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:07] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:12,521 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:12] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:17,529 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:17] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:22,516 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:22] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:27,526 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:27] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:32,529 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:32] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:37,518 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:37] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:38,486 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:38] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-14 20:06:42,521 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:42] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:47,518 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:47] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:52,517 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:52] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:06:57,518 - INFO - 127.0.0.1 - - [14/Jul/2025 20:06:57] "GET /files HTTP/1.1" 200 -
+2025-07-14 20:07:02,517 - INFO - 127.0.0.1 - - [14/Jul/2025 20:07:02] "GET /files HTTP/1.1" 200 -

@@ -1,0 +1,796 @@
+/* Temas para o Ambiente ISAC */
+
+/* Tema Claro (Padrão) */
+.theme-light {
+    --primary-color: #1976d2;
+    --secondary-color: #90caf9;
+    --background-color: #ffffff; 
+    --surface-color: #f4f4f4;
+    --card-color: #e3f2fd; 
+    --text-primary: #252323; 
+    --text-secondary: #424242; 
+    --text-sidebar: #ffffff;
+    --text-muted: #3a3a3a;
+    --border-color: #e0e0e0; /* cinza claro */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --navtabs-color: #000000;
+    --success-color: #4caf50; /* verde sucesso */
+    --warning-color: #ff9800; /* laranja alerta */
+    --danger-color: #f44336; /* vermelho */
+    --info-color: #2196f3; 
+    --link-color: #1e88e5;
+    --link-hover-color: #1565c0;
+
+    --active-primary:#ffffff;
+    --active-secondary:#2196f3;
+    --input-bg: #ffffff;
+    --input-border: #cccccc;
+    --input-text: #212121;
+
+    --table-bg: #ffffff;
+    --table-border: #e0e0e0;
+    --table-header-bg: #f1f1f1;
+    --table-row-hover: #e3f2fd;
+
+    --dropdown-bg: #ffffff;
+    --dropdown-border: #cccccc;
+    --dropdown-text: #212121;
+
+    --modal-bg: #ffffff;
+    --modal-header-bg: #f1f1f1;
+    --modal-border: #cccccc;
+
+    --tooltip-bg: #616161;
+    --tooltip-text: #ffffff;
+
+    --scrollbar-track: #f0f0f0;
+    --scrollbar-thumb: #c0c0c0;
+    --scrollbar-thumb-hover: #a0a0a0;
+}
+
+
+
+/* Tema Escuro */
+.theme-dark {
+    --primary-color: #272727;
+    --secondary-color: #111111;
+    --background-color: #0f0f0f;
+    --surface-color: #1a1a1a;
+    --card-color: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --text-muted: #b0b0b0;
+    --border-color: #404040;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --success-color: #3f3f3f;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #2c2c2c;
+    --link-color: #60a5fa;
+    --link-hover-color: #93c5fd;
+    --input-bg: #2d2d2d;
+    --input-border: #404040;
+    --input-text: #ffffff;
+    --table-bg: #1a1a1a;
+    --table-border: #404040;
+    --table-header-bg: #2d2d2d;
+    --table-row-hover: #2d2d2d;
+    --dropdown-bg: #2d2d2d;
+    --dropdown-border: #404040;
+    --dropdown-text: #ffffff;
+    --modal-bg: #1a1a1a;
+    --modal-header-bg: #2d2d2d;
+    --modal-border: #404040;
+    --tooltip-bg: #2d2d2d;
+    --tooltip-text: #ffffff;
+    --scrollbar-track: #1a1a1a;
+    --scrollbar-thumb: #404040;
+    --scrollbar-thumb-hover: #606060;
+
+    --active-primary:#404040;
+    --active-secondary:#1a1a1a;
+}
+
+/* Tema Azul */
+.theme-blue {
+    --primary-color: #2563eb;
+    --secondary-color: #1d4ed8;
+    --background-color: #ffffff;
+    --surface-color: #f0f9ff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #cbd5e1;
+    --shadow-color: rgba(37, 99, 235, 0.1);
+    --success-color: #059669;
+    --warning-color: #d97706;
+    --danger-color: #dc2626;
+    --info-color: #0891b2;
+}
+
+/* Tema Verde */
+.theme-green {
+    --primary-color: #059669;
+    --secondary-color: #047857;
+    --background-color: #ffffff;
+    --surface-color: #00ff4d;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #d1d5db;
+    --shadow-color: rgba(5, 150, 105, 0.1);
+    --success-color: #16a34a;
+    --warning-color: #ca8a04;
+    --danger-color: #dc2626;
+    --info-color: #0891b2;
+}
+
+/* Aplicação dos temas */
+body {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: var(--surface-color);
+    border-right: 1px solid var(--border-color);
+}
+
+.sidebar-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.sidebar-nav .nav-link {
+    color: var(--text-primary);
+}
+
+.sidebar-nav .nav-link:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.sidebar-nav .nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+}
+
+/* Cards e seções */
+.card, .config-section {
+    background-color: var(--card-color);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px var(--shadow-color);
+    color: var(--text-primary);
+}
+
+
+/* Listas e elementos de lista */
+.list-group, .list-group-item {
+    background-color: var(--card-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.list-group-item:hover {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+}
+
+.list-group-item.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Formulários */
+.form-control, .form-select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--input-text);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--input-bg);
+    border-color: var(--primary-color);
+    color: var(--input-text);
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    background-color: var(--dropdown-bg);
+    border-color: var(--dropdown-border);
+    color: var(--dropdown-text);
+}
+
+.dropdown-item {
+    color: var(--dropdown-text);
+}
+
+.dropdown-item:hover {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+}
+
+/* Botões */
+.btn-primary {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: var(--primary-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--card-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--surface-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Alertas */
+.alert-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+.alert-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: var(--text-primary);
+}
+
+.alert-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+    color: white;
+}
+
+.alert-info {
+    background-color: var(--info-color);
+    border-color: var(--info-color);
+    color: white;
+}
+
+/* Tabelas */
+.table {
+    background-color: var(--table-bg);
+    color: var(--text-primary);
+}
+
+.table th {
+    background-color: var(--table-header-bg);
+    color: var(--text-primary);
+    border-color: var(--table-border);
+}
+
+.table td {
+    border-color: var(--table-border);
+    color: var(--text-primary);
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--table-row-hover);
+    color: var(--text-primary);
+}
+
+/* Override específico para tabelas de software e outras tabelas de dados */
+.table tbody tr td {
+    color: var(--text-primary) !important;
+}
+
+.table tbody tr th {
+    color: var(--text-primary) !important;
+}
+
+/* Garantir que todas as células da tabela tenham texto claro */
+.table td, .table th {
+    color: var(--text-primary) !important;
+}
+
+/* Override para elementos dentro das células da tabela */
+.table td *, .table th * {
+    color: inherit !important;
+}
+
+/* Específico para tabelas de software */
+.table-software td,
+.table-software th {
+    color: var(--text-primary) !important;
+}
+
+/* Override para qualquer texto dentro de tabelas */
+.table * {
+    color: var(--text-primary) !important;
+}
+
+/* Modais */
+.modal-content {
+    background-color: var(--modal-bg);
+    border-color: var(--modal-border);
+    color: var(--text-primary);
+}
+
+.modal-header {
+    background-color: var(--modal-header-bg);
+    border-bottom-color: var(--modal-border);
+}
+
+.modal-footer {
+    background-color: var(--modal-header-bg);
+    border-top-color: var(--modal-border);
+}
+
+/* Footer */
+.footer {
+    background-color: var(--surface-color);
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* Links */
+a {
+    color: var(--link-color);
+}
+
+a:hover {
+    color: var(--link-hover-color);
+}
+
+/* Texto */
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+/* Tooltips */
+.tooltip-inner {
+    background-color: var(--tooltip-bg);
+    color: var(--tooltip-text);
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: var(--tooltip-bg);
+}
+
+.tooltip.bs-tooltip-bottom .tooltip-arrow::before {
+    border-bottom-color: var(--tooltip-bg);
+}
+
+.tooltip.bs-tooltip-start .tooltip-arrow::before {
+    border-left-color: var(--tooltip-bg);
+}
+
+.tooltip.bs-tooltip-end .tooltip-arrow::before {
+    border-right-color: var(--tooltip-bg);
+}
+
+/* Configurações específicas */
+.config-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+
+.config-item {
+    background-color: var(--background-color);
+    border-color: var(--border-color);
+}
+
+.config-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.theme-option {
+    background-color: var(--background-color);
+    border-color: var(--border-color);
+}
+
+.theme-option:hover {
+    border-color: var(--primary-color);
+    background-color: var(--surface-color);
+}
+
+.theme-option.selected {
+    border-color: var(--primary-color);
+    background-color: var(--surface-color);
+}
+
+.language-option {
+    background-color: var(--background-color);
+    border-color: var(--border-color);
+}
+
+.language-option:hover {
+    border-color: var(--primary-color);
+    background-color: var(--surface-color);
+}
+
+.language-option.selected {
+    border-color: var(--primary-color);
+    background-color: var(--surface-color);
+}
+
+/* Preview boxes */
+.preview-box {
+    background-color: var(--surface-color);
+    color: var(--text-secondary);
+}
+
+.current-config {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+/* Responsividade para tema escuro */
+@media (prefers-color-scheme: dark) {
+    .theme-auto {
+        --primary-color: #4f46e5;
+        --secondary-color: #7c3aed;
+        --background-color: #1a1a1a;
+        --surface-color: #2d2d2d;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --border-color: #404040;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Responsividade para tema claro */
+@media (prefers-color-scheme: light) {
+    .theme-auto {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --background-color: #ffffff;
+        --surface-color: #f8f9fa;
+        --text-primary: #212529;
+        --text-secondary: #6c757d;
+        --border-color: #dee2e6;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Animações de transição */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+
+/* Melhorias para acessibilidade */
+.theme-dark .form-control::placeholder {
+    color: var(--text-secondary);
+}
+
+.theme-dark .form-select option {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
+}
+
+/* Scrollbar personalizada */
+.theme-dark ::-webkit-scrollbar {
+    width: 8px;
+}
+
+.theme-dark ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+.theme-dark ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+}
+
+.theme-dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+/* Estilos específicos para tema escuro */
+.theme-dark {
+    /* Garantir que todos os textos sejam brancos */
+    color: var(--text-primary)
+}
+
+.theme-dark h1, .theme-dark h2, .theme-dark h3,
+.theme-dark h4, .theme-dark h5, .theme-dark h6 {
+    color: var(--text-primary)
+}
+
+.theme-dark p, .theme-dark span, .theme-dark div {
+    color: var(--text-primary);
+}
+
+.theme-dark .card-body {
+    color: var(--text-primary);
+}
+
+.theme-dark .card-title {
+    color: var(--text-primary);
+}
+
+
+
+.theme-dark .card-text {
+    color: var(--text-secondary);
+}
+
+/* Configurações específicas para tema escuro */
+.theme-dark .config-item {
+    background-color: var(--card-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .config-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.theme-dark .theme-option {
+    background-color: var(--card-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .theme-option:hover {
+    border-color: var(--primary-color);
+    background-color: var(--surface-color);
+}
+
+.theme-dark .theme-option.selected {
+    border-color: var(--primary-color);
+    background-color: var(--surface-color);
+}
+
+.theme-dark .language-option {
+    background-color: var(--card-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .language-option:hover {
+    border-color: var(--primary-color);
+    background-color: var(--surface-color);
+}
+
+.theme-dark .language-option.selected {
+    border-color: var(--primary-color);
+    background-color: var(--surface-color);
+}
+
+/* Preview boxes no tema escuro */
+.theme-dark .preview-box {
+    background-color: var(--card-color);
+    color: var(--text-secondary);
+}
+
+.theme-dark .current-config {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+/* Timezone preview no tema escuro */
+.theme-dark .timezone-preview {
+    background-color: var(--card-color);
+    color: var(--text-secondary);
+}
+
+/* Override para elementos específicos */
+.theme-dark .container-fluid {
+    background-color: var(--background-color);
+}
+
+.theme-dark .main-content {
+    background-color: var(--background-color);
+}
+
+.theme-dark .row {
+    color: var(--text-primary);
+}
+
+.theme-dark .col, .theme-dark .col-md-3, .theme-dark .col-md-6 {
+    color: var(--text-primary);
+}
+
+/* Garantir que ícones sejam visíveis */
+.theme-dark .bi {
+    color: inherit;
+}
+
+/* Override para elementos Bootstrap específicos */
+.theme-dark .badge {
+    color: var(--text-primary);
+}
+
+.theme-dark .progress {
+    background-color: var(--surface-color);
+}
+
+.theme-dark .progress-bar {
+    background-color: var(--primary-color);
+}
+
+/* Override para elementos de navegação */
+.theme-dark .breadcrumb {
+    background-color: var(--card-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .breadcrumb-item a {
+    color: var(--link-color);
+}
+
+.theme-dark .breadcrumb-item.active {
+    color: var(--text-secondary);
+}
+
+/* Override para paginação */
+.theme-dark .pagination {
+    background-color: var(--card-color);
+}
+
+.theme-dark .page-link {
+    background-color: var(--card-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .page-link:hover {
+    background-color: var(--surface-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Override para elementos de formulário específicos */
+.theme-dark .form-label {
+    color: var(--text-primary);
+}
+
+.theme-dark .form-text {
+    color: var(--text-muted);
+}
+
+.theme-dark .form-check-label {
+    color: var(--text-primary);
+}
+
+/* Override para elementos de navegação */
+.theme-dark .nav-tabs {
+    border-bottom-color: var(--border-color);
+}
+
+.theme-dark .nav-tabs .nav-link {
+    background-color: var(--card-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .nav-tabs .nav-link:hover {
+    background-color: var(--surface-color);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.theme-dark .nav-tabs .nav-link.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Override para elementos de lista específicos */
+.theme-dark .list-unstyled {
+    color: var(--text-primary);
+}
+
+.theme-dark .list-inline {
+    color: var(--text-primary);
+}
+
+.theme-dark .list-inline-item {
+    color: var(--text-primary);
+}
+
+/* Override específico para tabelas no tema escuro */
+.theme-dark .table {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .table th {
+    color: var(--text-primary) !important;
+    background-color: var(--table-header-bg) !important;
+}
+
+.theme-dark .table td {
+    color: var(--text-primary) !important;
+    background-color: var(--table-bg) !important;
+}
+
+.theme-dark .table tbody tr {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .table tbody tr td {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .table tbody tr th {
+    color: var(--text-primary) !important;
+}
+
+/* Garantir que todos os elementos dentro da tabela sejam claros */
+.theme-dark .table * {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .table td * {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark .table th * {
+    color: var(--text-primary) !important;
+}
+
+/* Override para tabelas específicas como software */
+.theme-dark .table-software,
+.theme-dark .table-software td,
+.theme-dark .table-software th,
+.theme-dark .table-software * {
+    color: var(--text-primary) !important;
+}
+
+/* Override para qualquer tabela de dados */
+.theme-dark [class*="table"] {
+    color: var(--text-primary) !important;
+}
+
+.theme-dark [class*="table"] td,
+.theme-dark [class*="table"] th {
+    color: var(--text-primary) !important;
+}
+
+/* Forçar cor clara em todas as células de tabela */
+.theme-dark td,
+.theme-dark th {
+    color: var(--text-primary) !important;
+}
+
+.theme-light .main-content {
+    background-color: var(--background-color);
+}

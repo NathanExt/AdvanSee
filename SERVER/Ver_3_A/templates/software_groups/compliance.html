@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}Conformidade de Software - {{ asset.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-check-circle"></i> Conformidade de Software
+                        <small class="text-muted">- {{ asset.name }}</small>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Status de Conformidade -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h3 class="text-primary">{{ compliance.compliance_percentage|round(1) }}%</h3>
+                                    <p class="mb-0">Conformidade</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h3 class="text-success">{{ compliance.total_required }}</h3>
+                                    <p class="mb-0">Software Necessário</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h3 class="text-warning">{{ compliance.missing_software|length }}</h3>
+                                    <p class="mb-0">Software Faltante</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h3 class="text-info">{{ compliance.total_installed }}</h3>
+                                    <p class="mb-0">Software Instalado</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            {% if compliance.status == 'compliant' %}
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle-fill"></i> Asset em conformidade total
+                            </div>
+                            {% elif compliance.status == 'mostly_compliant' %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Asset quase em conformidade
+                            </div>
+                            {% elif compliance.status == 'partially_compliant' %}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Asset parcialmente em conformidade
+                            </div>
+                            {% elif compliance.status == 'non_compliant' %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-x-circle-fill"></i> Asset não está em conformidade
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Software Faltante -->
+                    {% if compliance.missing_software %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="mb-0">
+                                        <i class="bi bi-exclamation-triangle"></i> Software Faltante
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Software</th>
+                                                    <th>Fabricante</th>
+                                                    <th>Versão</th>
+                                                    <th>Grupo</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for software in compliance.missing_software %}
+                                                <tr>
+                                                    <td>{{ software.name }}</td>
+                                                    <td>{{ software.vendor or 'N/A' }}</td>
+                                                    <td>{{ software.version or 'Última' }}</td>
+                                                    <td>
+                                                        <span class="badge bg-info">{{ software.group_name }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" 
+                                                                onclick="scheduleInstallation({{ asset.id }}, '{{ software.name }}', '{{ software.vendor or '' }}', '{{ software.version or '' }}')">
+                                                            <i class="bi bi-download"></i> Instalar
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-primary" onclick="scheduleAllInstallations()">
+                                            <i class="bi bi-download"></i> Instalar Todos
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Status de Instalação -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i class="bi bi-clock"></i> Status de Instalação
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="installation-status">
+                                        <div class="text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Carregando...</span>
+                                            </div>
+                                            <p class="mt-2">Carregando status de instalação...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ações -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i class="bi bi-gear"></i> Ações
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-primary" onclick="executePendingTasks()">
+                                            <i class="bi bi-play-circle"></i> Executar Tarefas Pendentes
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="refreshCompliance()">
+                                            <i class="bi bi-arrow-clockwise"></i> Atualizar Análise
+                                        </button>
+                                        <a href="{{ url_for('assets.asset_detail', asset_id=asset.id) }}" class="btn btn-outline-secondary">
+                                            <i class="bi bi-arrow-left"></i> Voltar ao Asset
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Carregar status de instalação ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+    loadInstallationStatus();
+});
+
+function loadInstallationStatus() {
+    fetch(`/assets/{{ asset.id }}/software-installation-status`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayInstallationStatus(data.status_list);
+            } else {
+                document.getElementById('installation-status').innerHTML = 
+                    '<div class="alert alert-danger">Erro ao carregar status de instalação</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            document.getElementById('installation-status').innerHTML = 
+                '<div class="alert alert-danger">Erro ao carregar status de instalação</div>';
+        });
+}
+
+function displayInstallationStatus(statusList) {
+    if (statusList.length === 0) {
+        document.getElementById('installation-status').innerHTML = 
+            '<div class="alert alert-info">Nenhuma tarefa de instalação pendente</div>';
+        return;
+    }
+
+    let html = '<div class="table-responsive"><table class="table table-sm">';
+    html += '<thead><tr><th>Software</th><th>Ação</th><th>Status</th><th>Data</th><th>Mensagem</th></tr></thead><tbody>';
+    
+    statusList.forEach(status => {
+        let statusBadge = '';
+        switch(status.status) {
+            case 'pending':
+                statusBadge = '<span class="badge bg-warning">Pendente</span>';
+                break;
+            case 'in_progress':
+                statusBadge = '<span class="badge bg-info">Em Progresso</span>';
+                break;
+            case 'completed':
+                statusBadge = '<span class="badge bg-success">Concluído</span>';
+                break;
+            case 'failed':
+                statusBadge = '<span class="badge bg-danger">Falhou</span>';
+                break;
+            case 'blocked':
+                statusBadge = '<span class="badge bg-secondary">Bloqueado</span>';
+                break;
+        }
+
+        let actionBadge = status.action_type === 'install' ? 
+            '<span class="badge bg-primary">Instalar</span>' : 
+            '<span class="badge bg-warning">Desinstalar</span>';
+
+        html += `<tr>
+            <td>${status.software_name}</td>
+            <td>${actionBadge}</td>
+            <td>${statusBadge}</td>
+            <td>${status.created_at ? new Date(status.created_at).toLocaleString('pt-BR') : 'N/A'}</td>
+            <td>${status.error_message || status.blocked_reason || '-'}</td>
+        </tr>`;
+    });
+    
+    html += '</tbody></table></div>';
+    document.getElementById('installation-status').innerHTML = html;
+}
+
+function scheduleInstallation(assetId, softwareName, vendor, version) {
+    const softwareList = [{
+        name: softwareName,
+        vendor: vendor,
+        version: version
+    }];
+
+    fetch(`/assets/${assetId}/schedule-software-installation`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            software_list: softwareList,
+            action_type: 'install'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                loadInstallationStatus();
+            }, 1000);
+        } else {
+            showAlert('error', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('error', 'Erro ao agendar instalação');
+    });
+}
+
+function scheduleAllInstallations() {
+    const missingSoftware = {{ compliance.missing_software|tojson }};
+    const softwareList = missingSoftware.map(software => ({
+        name: software.name,
+        vendor: software.vendor || '',
+        version: software.version || ''
+    }));
+
+    fetch(`/assets/{{ asset.id }}/schedule-software-installation`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            software_list: softwareList,
+            action_type: 'install'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                loadInstallationStatus();
+            }, 1000);
+        } else {
+            showAlert('error', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('error', 'Erro ao agendar instalações');
+    });
+}
+
+function executePendingTasks() {
+    fetch(`/assets/{{ asset.id }}/execute-software-tasks`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                loadInstallationStatus();
+            }, 2000);
+        } else {
+            showAlert('error', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('error', 'Erro ao executar tarefas');
+    });
+}
+
+function refreshCompliance() {
+    window.location.reload();
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container-fluid');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
+{% endblock %} 

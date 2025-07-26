@@ -1,0 +1,623 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/asset_detail.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="asset-header mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="asset-icon me-3">
+                    {% if asset.computer_model and 'laptop' in asset.computer_model.lower() %}
+                        <i class="bi bi-laptop text-primary" style="font-size: 2.5rem;"></i>
+                    {% else %}
+                        <i class="bi bi-pc-display text-primary" style="font-size: 2.5rem;"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <h2 class="mb-1">{{ asset.name }}</h2>
+                    <p class="text-muted mb-0">{{ asset.asset_tag or asset.name }}</p>
+                    <small class="text-muted">
+                        <i class="bi bi-clock"></i> 
+                        Última atualização: {{ asset.updated_at.strftime('%d/%m/%Y, %H:%M') if asset.updated_at else 'N/A' }}
+                    </small>
+</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex justify-content-end gap-2">
+                <!-- Status Buttons -->
+                <div class="btn-group" role="group">
+                    <!--
+                    <button type="button" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-globe"></i> {{ asset.status or 'Status' }}
+                        <i class="bi bi-pencil ms-1"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-geo-alt"></i> Localização
+                        <i class="bi bi-pencil ms-1"></i>
+                    </button>-->
+                    <button type="button" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-person"></i>
+                            <div>
+                                {{ ad_user.display_name  or asset.logged_user}}
+                            </div>
+                        {{ ad_user.email_address }}
+                    </button>
+                </div>
+  
+                <!-- Action Buttons -->
+                <div class="btn-group" role="group">
+                    <!--
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#installMsiModal">
+                        <i class="bi bi-download"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-flag"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-sm">
+                        <i class="bi bi-pencil"></i> Editar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Tabs -->
+<ul class="nav nav-tabs mb-4" id="assetTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="inicio-tab" data-bs-toggle="tab" data-bs-target="#inicio" type="button" role="tab">
+            <i class="bi bi-house"></i> Início
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="hardware-tab" data-bs-toggle="tab" data-bs-target="#hardware" type="button" role="tab">
+            <i class="bi bi-cpu"></i> Hardware
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="aplicacoes-tab" data-bs-toggle="tab" data-bs-target="#aplicacoes" type="button" role="tab">
+            <i class="bi bi-box"></i> Software Instalado
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contratos-tab" data-bs-toggle="tab" data-bs-target="#contratos" type="button" role="tab">
+            <i class="bi bi-file-text"></i> Contratos
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="financeiro-tab" data-bs-toggle="tab" data-bs-target="#financeiro" type="button" role="tab">
+            <i class="bi bi-currency-dollar"></i> Dados Financeiros
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="solicita-tab" data-bs-toggle="tab" data-bs-target="#solicita" type="button" role="tab">
+            <i class="bi bi-clipboard"></i> Solicitações
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="implanta-tab" data-bs-toggle="tab" data-bs-target="#implanta" type="button" role="tab">
+            <i class="bi bi-arrow-repeat"></i> Implantação
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="atividade-tab" data-bs-toggle="tab" data-bs-target="#atividade" type="button" role="tab">
+            <i class="bi bi-activity"></i> Atividade
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="eventos-tab" data-bs-toggle="tab" data-bs-target="#eventos" type="button" role="tab">
+            <i class="bi bi-check-circle"></i> Eventos
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="assetTabsContent">
+    
+    <!-- Início Tab -->
+    <div class="tab-pane fade show active" id="inicio" role="tabpanel">
+        
+        <!-- Critical Status Alerts -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card border-danger border-start border-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="text-danger mb-1">
+                                    <i class="bi bi-wifi-off"></i> A conectividade está Desconectada
+                                </h6>
+                                <p class="text-muted mb-0">O Agente {{ agent.agent_version if agent else 'N/A' }} reportou há {{ ((asset.last_seen - asset.updated_at).days if asset.last_seen and asset.updated_at else 0) }} dias</p>
+                            </div>
+                            <i class="bi bi-clock-x text-danger"></i>
+                        </div>
+            </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-danger border-start border-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="text-danger mb-1">
+                                    <i class="bi bi-shield-x"></i> O antivírus não foi detectado
+                                </h6>
+                                <p class="text-muted mb-0">Não conseguimos detectar seu antivírus</p>
+                            </div>
+                            <i class="bi bi-bug text-danger"></i>
+                        </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="row mb-4">
+    <div class="col-md-6">
+                <div class="card border-danger border-start border-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="text-danger mb-1">
+                                    <i class="bi bi-fire"></i> Firewall está Desativado
+                                </h6>
+                                <p class="text-muted mb-0">O Firewall foi detectado</p>
+                            </div>
+                            <i class="bi bi-fire text-danger"></i>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+                <div class="card border-danger border-start border-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="text-danger mb-1">
+                                    <i class="bi bi-heart-pulse"></i> Estado de saúde: Crítico
+                                </h6>
+                                <p class="text-muted mb-0">3 de 7 condições não são atendidas</p>
+            </div>
+                            <i class="bi bi-exclamation-triangle text-danger"></i>
+            </div>
+                        
+                        <!-- Health Conditions -->
+                        <div class="mt-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="bg-danger rounded me-2" style="width: 4px; height: 20px;"></div>
+                                <span class="small">Firewall está desativado</span>
+                                <i class="bi bi-check text-success ms-auto"></i>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="bg-warning rounded me-2" style="width: 4px; height: 20px;"></div>
+                                <span class="small">O computador não foi atualizado nos últimos 7 dias</span>
+                                <i class="bi bi-exclamation text-warning ms-auto"></i>
+            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-warning rounded me-2" style="width: 4px; height: 20px;"></div>
+                                <span class="small">A criptografia não foi detectada</span>
+                                <i class="bi bi-exclamation text-warning ms-auto"></i>
+            </div>
+        </div>
+
+                        <div class="mt-3 pt-2 border-top">
+                            <small class="text-muted">
+                                A regra que se aplica é Computers<br>
+                                Atualizado há {{ ((asset.updated_at - asset.created_at).days if asset.updated_at and asset.created_at else 0) }} horas
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                    </div>
+                    
+        <!-- Information Cards -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="bi bi-box"></i> Software
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-ubuntu me-2" style="font-size: 1.5rem;"></i>
+                            <span class="fw-bold">{{ asset.operating_system or 'N/A' }}</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Versão do SO</small>
+                                <p class="mb-1">{{ asset.os_version or 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Instalações</small>
+                                <p class="mb-1">{{ installed_software_entries|length if installed_software_entries else 0 }}</p>
+                            </div>
+                        </div>
+                                <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Dependências</small>
+                                <p class="mb-1">25</p>
+                                    </div>
+                            <div class="col-6">
+                                <small class="text-muted">Tempo de atividade</small>
+                                <p class="mb-1">1h 2m 59s</p>
+                                    </div>
+                                </div>
+                        <hr>
+                        <div class="row">
+                                    <div class="col-12">
+                                <small class="text-muted">Descrição do computador</small>
+                                <p class="mb-1 text-muted">Vazio</p>
+                                    </div>
+                                </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">SELinux</small>
+                                <p class="mb-1 text-muted">Vazio</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Número de série</small>
+                                <p class="mb-1 text-muted">Vazio</p>
+                            </div>
+                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+            
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Campos personalizados</h6>
+                        <i class="bi bi-pencil text-muted"></i>
+                    </div>
+                    <div class="card-body text-center">
+                        <p class="text-muted mb-0">Não há campos personalizados atribuídos</p>
+                                    </div>
+                                </div>
+                            </div>
+            
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Solicitações</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <small class="text-muted">Por tipo</small>
+                        <h4 class="mb-0">0</h4>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Etiquetas</h6>
+                        <i class="bi bi-pencil text-muted"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+                            <span class="small">todos-computadores</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+                            <span class="small">América do Norte</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+    <!-- Hardware Tab -->
+    <div class="tab-pane fade" id="hardware" role="tabpanel">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+            <div class="card-header">
+                        <h6 class="mb-0">Informações Gerais</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">ID</small>
+                                <p class="mb-2">{{ asset.id }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Asset Tag</small>
+                                <p class="mb-2">{{ asset.asset_tag or 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Marca</small>
+                                <p class="mb-2">{{ asset.computer_manufacturer or 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Modelo</small>
+                                <p class="mb-2">{{ asset.computer_model or 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Número de Série</small>
+                                <p class="mb-2">{{ asset.serial_number or 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Status</small>
+                                <p class="mb-2">
+                                    <span class="badge bg-{{ 'success' if asset.status == 'active' else 'warning' if asset.status == 'inactive' else 'secondary' }}">
+                                        {{ asset.status }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Processador</h6>
+            </div>
+            <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Processador</small>
+                                <p class="mb-2">{{ asset.processor or 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Arquitetura</small>
+                                <p class="mb-2">{{ asset.architecture or 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">CPU Cores (Físicas)</small>
+                                <p class="mb-2">{{ asset.cpu_count or 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">CPU Cores (Lógicas)</small>
+                                <p class="mb-2">{{ asset.cpu_count_logical or 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+            <div class="card-header">
+                        <h6 class="mb-0">Memória</h6>
+            </div>
+            <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Memória Total</small>
+                                <p class="mb-2">{{ "{:,.2f} GB".format(asset.total_memory_bytes / (1024**3)) if asset.total_memory_bytes else 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Memória Disponível</small>
+                                <p class="mb-2">{{ "{:,.2f} GB".format(asset.available_memory_bytes / (1024**3)) if asset.available_memory_bytes else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Percentual de Uso</small>
+                                <p class="mb-2">{{ "{:,.2f}%".format(asset.memory_percent) if asset.memory_percent else 'N/A' }}</p>
+                            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <div class="col-md-6">
+                <div class="card">
+    <div class="card-header">
+                        <h6 class="mb-0">Disco</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Disco Total</small>
+                                <p class="mb-2">{{ "{:,.2f} GB".format(asset.total_disk_bytes / (1024**3)) if asset.total_disk_bytes else 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Disco Usado</small>
+                                <p class="mb-2">{{ "{:,.2f} GB".format(asset.used_disk_bytes / (1024**3)) if asset.used_disk_bytes else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Disco Livre</small>
+                                <p class="mb-2">{{ "{:,.2f} GB".format(asset.free_disk_bytes / (1024**3)) if asset.free_disk_bytes else 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Percentual de Uso</small>
+                                <p class="mb-2">{{ "{:,.2f}%".format(asset.disk_percent) if asset.disk_percent else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Aplicações Tab -->
+    <div class="tab-pane fade" id="aplicacoes" role="tabpanel">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Software Instalado</h6>
+    </div>
+    <div class="card-body">
+        {% if installed_software_entries %}
+                <div class="table-responsive">
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>Nome do Software</th>
+                    <th>Fornecedor</th>
+                    <th>Versão</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in installed_software_entries %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.vendor if item.vendor else 'N/A' }}</td>
+                    <td>{{ item.version if item.version else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+                </div>
+        {% else %}
+                <p class="text-muted">Nenhum software instalado foi descoberto por este ativo.</p>
+        {% endif %}
+    </div>
+</div>
+    </div>
+    
+    <!-- Contratos Tab -->
+    <div class="tab-pane fade" id="contratos" role="tabpanel">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-file-text text-muted" style="font-size: 3rem;"></i>
+                <h5 class="text-muted mt-3">Nenhum contrato associado</h5>
+                <p class="text-muted">Este ativo não possui contratos vinculados.</p>
+    </div>
+</div>
+    </div>
+    
+    <!-- Dados financeiro Tab -->
+    <div class="tab-pane fade" id="financeiro" role="tabpanel">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Informações Financeiras</h6>
+    </div>
+    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Data de Compra</small>
+                                <p class="mb-2">{{ asset.purchase_date.strftime('%d/%m/%Y') if asset.purchase_date else 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Valor de Compra</small>
+                                <p class="mb-2">{{ "${:,.2f}".format(asset.purchase_cost) if asset.purchase_cost else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Garantia</small>
+                                <p class="mb-2">{{ asset.warranty_expiry.strftime('%d/%m/%Y') if asset.warranty_expiry else 'N/A' }}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Organização</small>
+                                <p class="mb-2">{{ asset.organization.name if asset.organization else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </div>
+</div>
+    </div>
+    
+    <!-- solicita Tab -->
+    <div class="tab-pane fade" id="solicita" role="tabpanel">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-clipboard text-muted" style="font-size: 3rem;"></i>
+                <h5 class="text-muted mt-3">Nenhuma solicitação</h5>
+                <p class="text-muted">Este ativo não possui solicitações associadas.</p>
+    </div>
+</div>
+    </div>
+    
+    <!-- implementa Tab -->
+    <div class="tab-pane fade" id="implanta" role="tabpanel">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="bi bi-arrow-repeat text-muted" style="font-size: 3rem;"></i>
+                <h5 class="text-muted mt-3">Nenhuma implantação</h5>
+                <p class="text-muted">Este ativo não possui informações de implantação.</p>
+    </div>
+</div>
+    </div>
+    
+    <!-- atividade Tab -->
+    <div class="tab-pane fade" id="atividade" role="tabpanel">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Histórico de Atividades</h6>
+    </div>
+    <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Ativo criado</h6>
+                            <p class="text-muted mb-0">{{ asset.created_at.strftime('%d/%m/%Y %H:%M') if asset.created_at else 'N/A' }}</p>
+                        </div>
+                    </div>
+                    {% if asset.last_seen %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Último check-in</h6>
+                            <p class="text-muted mb-0">{{ asset.last_seen.strftime('%d/%m/%Y %H:%M') }}</p>
+                        </div>
+                    </div>
+        {% endif %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-info"></div>
+                        <div class="timeline-content">
+                            <h6 class="mb-1">Última atualização</h6>
+                            <p class="text-muted mb-0">{{ asset.updated_at.strftime('%d/%m/%Y %H:%M') if asset.updated_at else 'N/A' }}</p>
+    </div>
+</div>
+    </div>
+    </div>
+</div>
+    </div>
+
+    <!-- Eventos Tab -->
+    <div class="tab-pane fade" id="eventos" role="tabpanel">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="text-muted mt-3">Nenhum evento</h5>
+                    <p class="text-muted">Este ativo não possui eventos associados.</p>
+                </div>
+
+            </div>
+        </div>
+        <button class="btn btn-primary btn-block mt-3" data-bs-toggle="modal" data-bs-target="#create-event-modal">Habilitas Eventos</button>
+    </div>
+    
+</div>
+
+<!-- Modals -->
+{% include 'modal.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/asset_detail.js') }}"></script>
+{% endblock %}

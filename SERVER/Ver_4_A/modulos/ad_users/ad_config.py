@@ -1,0 +1,15 @@
+from config import CONFIG
+class CONFIG_AD:
+    # Usar configurações da classe principal
+    DB_HOST = CONFIG.DB_HOST
+    DB_NAME = CONFIG.DB_NAME_USERS
+    DB_USER = CONFIG.DB_USER
+    DB_PASSWORD = CONFIG.DB_PASSWORD
+    DB_PORT = CONFIG.DB_PORT
+    EMAIL = "isac.admin@advansee.com.br"
+
+    # URL do banco USERS
+    DATABASE_URL_USERS = CONFIG.DATABASE_URL_USERS
+
+    # Configurações SQLAlchemy
+    SQLALCHEMY_TRACK_MODIFICATIONS = CONFIG.SQLALCHEMY_TRACK_MODIFICATIONS

@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% block title %}Criar Grupo de Software{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-plus-circle"></i> Criar Novo Grupo de Software
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="createGroupForm">
+                        <!-- Informações Básicas -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="groupName" class="form-label">Nome do Grupo *</label>
+                                <input type="text" class="form-control" id="groupName" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="groupRequired" class="form-label">Grupo Obrigatório</label>
+                                <select class="form-select" id="groupRequired" name="is_required">
+                                    <option value="true">Sim</option>
+                                    <option value="false">Não</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label for="groupDescription" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="groupDescription" name="description" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Software do Grupo -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">
+                                            <i class="bi bi-box"></i> Software do Grupo
+                                        </h6>
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="addSoftwareItem()">
+                                            <i class="bi bi-plus"></i> Adicionar Software
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="softwareItems">
+                                            <!-- Software items serão adicionados aqui -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Políticas -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">
+                                            <i class="bi bi-shield-check"></i> Políticas
+                                        </h6>
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="addPolicy()">
+                                            <i class="bi bi-plus"></i> Adicionar Política
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="policies">
+                                            <!-- Políticas serão adicionadas aqui -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('software_groups.software_groups_list') }}" class="btn btn-secondary">
+                                        <i class="bi bi-arrow-left"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-circle"></i> Criar Grupo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let softwareItemCount = 0;
+let policyCount = 0;
+
+// Software suportado para sugestões
+const supportedSoftware = [
+    { name: 'Google Chrome', vendor: 'Google LLC', version: 'latest' },
+    { name: 'Mozilla Firefox', vendor: 'Mozilla Corporation', version: 'latest' },
+    { name: '7-Zip', vendor: 'Igor Pavlov', version: 'latest' },
+    { name: 'Adobe Reader', vendor: 'Adobe Inc.', version: 'latest' },
+    { name: 'Visual Studio Code', vendor: 'Microsoft Corporation', version: 'latest' },
+    { name: 'Git', vendor: 'Git for Windows', version: 'latest' },
+    { name: 'Python', vendor: 'Python Software Foundation', version: '3.11' },
+    { name: 'Node.js', vendor: 'Node.js Foundation', version: 'latest' }
+];
+
+function addSoftwareItem() {
+    const container = document.getElementById('softwareItems');
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'row mb-3 software-item';
+    itemDiv.id = `software-item-${softwareItemCount}`;
+    
+    itemDiv.innerHTML = `
+        <div class="col-md-4">
+            <label class="form-label">Nome do Software *</label>
+            <input type="text" class="form-control software-name" name="software_items[${softwareItemCount}][name]" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Fabricante</label>
+            <input type="text" class="form-control software-vendor" name="software_items[${softwareItemCount}][vendor]">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Versão</label>
+            <input type="text" class="form-control software-version" name="software_items[${softwareItemCount}][version]" placeholder="latest">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Obrigatório</label>
+            <select class="form-select software-required" name="software_items[${softwareItemCount}][is_required]">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <label class="form-label">&nbsp;</label>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSoftwareItem(${softwareItemCount})">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(itemDiv);
+    softwareItemCount++;
+    
+    // Adicionar autocomplete para o nome do software
+    const nameInput = itemDiv.querySelector('.software-name');
+    nameInput.addEventListener('input', function() {
+        const value = this.value.toLowerCase();
+        const suggestions = supportedSoftware.filter(sw => 
+            sw.name.toLowerCase().includes(value)
+        );
+        
+        if (suggestions.length > 0 && value.length > 2) {
+            showSoftwareSuggestions(this, suggestions);
+        }
+    });
+}
+
+function removeSoftwareItem(index) {
+    const item = document.getElementById(`software-item-${index}`);
+    if (item) {
+        item.remove();
+    }
+}
+
+function showSoftwareSuggestions(input, suggestions) {
+    // Remover sugestões existentes
+    const existing = document.querySelector('.software-suggestions');
+    if (existing) {
+        existing.remove();
+    }
+    
+    // Criar lista de sugestões
+    const suggestionsDiv = document.createElement('div');
+    suggestionsDiv.className = 'software-suggestions list-group position-absolute';
+    suggestionsDiv.style.zIndex = '1000';
+    suggestionsDiv.style.width = input.offsetWidth;
+    
+    suggestions.forEach(suggestion => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'list-group-item list-group-item-action';
+        item.textContent = suggestion.name;
+        item.onclick = function() {
+            const itemDiv = input.closest('.software-item');
+            itemDiv.querySelector('.software-name').value = suggestion.name;
+            itemDiv.querySelector('.software-vendor').value = suggestion.vendor;
+            itemDiv.querySelector('.software-version').value = suggestion.version;
+            suggestionsDiv.remove();
+        };
+        suggestionsDiv.appendChild(item);
+    });
+    
+    input.parentNode.style.position = 'relative';
+    input.parentNode.appendChild(suggestionsDiv);
+    
+    // Remover sugestões ao clicar fora
+    document.addEventListener('click', function removeSuggestions(e) {
+        if (!suggestionsDiv.contains(e.target) && e.target !== input) {
+            suggestionsDiv.remove();
+            document.removeEventListener('click', removeSuggestions);
+        }
+    });
+}
+
+function addPolicy() {
+    const container = document.getElementById('policies');
+    const policyDiv = document.createElement('div');
+    policyDiv.className = 'row mb-3 policy-item';
+    policyDiv.id = `policy-${policyCount}`;
+    
+    policyDiv.innerHTML = `
+        <div class="col-md-3">
+            <label class="form-label">Nome da Política *</label>
+            <input type="text" class="form-control policy-name" name="policies[${policyCount}][name]" required>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Tipo *</label>
+            <select class="form-select policy-type" name="policies[${policyCount}][type]" onchange="updatePolicyValue(${policyCount})">
+                <option value="installation">Instalação</option>
+                <option value="uninstallation">Desinstalação</option>
+                <option value="update">Atualização</option>
+                <option value="blocking">Bloqueio</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Configuração</label>
+            <textarea class="form-control policy-value" name="policies[${policyCount}][value]" rows="2" placeholder="JSON de configuração"></textarea>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Ativa</label>
+            <select class="form-select policy-enabled" name="policies[${policyCount}][is_enabled]">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <label class="form-label">&nbsp;</label>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePolicy(${policyCount})">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(policyDiv);
+    updatePolicyValue(policyCount);
+    policyCount++;
+}
+
+function removePolicy(index) {
+    const policy = document.getElementById(`policy-${index}`);
+    if (policy) {
+        policy.remove();
+    }
+}
+
+function updatePolicyValue(index) {
+    const policyDiv = document.getElementById(`policy-${index}`);
+    const typeSelect = policyDiv.querySelector('.policy-type');
+    const valueTextarea = policyDiv.querySelector('.policy-value');
+    
+    const type = typeSelect.value;
+    let defaultValue = '';
+    
+    switch(type) {
+        case 'installation':
+            defaultValue = JSON.stringify({
+                auto_install: true,
+                silent_install: true,
+                require_approval: false
+            }, null, 2);
+            break;
+        case 'uninstallation':
+            defaultValue = JSON.stringify({
+                prevent_uninstall: false,
+                require_approval: true
+            }, null, 2);
+            break;
+        case 'update':
+            defaultValue = JSON.stringify({
+                auto_update: true,
+                check_interval: "daily"
+            }, null, 2);
+            break;
+        case 'blocking':
+            defaultValue = JSON.stringify({
+                prevent_uninstall: true,
+                prevent_install: false,
+                reason: "Software essencial"
+            }, null, 2);
+            break;
+    }
+    
+    valueTextarea.value = defaultValue;
+}
+
+// Submissão do formulário
+document.getElementById('createGroupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        is_required: formData.get('is_required') === 'true',
+        software_items: [],
+        policies: []
+    };
+    
+    // Coletar software items
+    document.querySelectorAll('.software-item').forEach(item => {
+        data.software_items.push({
+            name: item.querySelector('.software-name').value,
+            vendor: item.querySelector('.software-vendor').value,
+            version: item.querySelector('.software-version').value,
+            is_required: item.querySelector('.software-required').value === 'true'
+        });
+    });
+    
+    // Coletar políticas
+    document.querySelectorAll('.policy-item').forEach(item => {
+        data.policies.push({
+            name: item.querySelector('.policy-name').value,
+            type: item.querySelector('.policy-type').value,
+            value: item.querySelector('.policy-value').value,
+            is_enabled: item.querySelector('.policy-enabled').value === 'true'
+        });
+    });
+    
+    // Enviar dados
+    fetch('/software-groups/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            showAlert('success', result.message);
+            setTimeout(() => {
+                window.location.href = '/software-groups';
+            }, 1500);
+        } else {
+            showAlert('error', result.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showAlert('error', 'Erro ao criar grupo de software');
+    });
+});
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container-fluid');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+
+// Adicionar um software item inicial
+document.addEventListener('DOMContentLoaded', function() {
+    addSoftwareItem();
+    addPolicy();
+});
+</script>
+
+<style>
+.software-suggestions {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.software-suggestions .list-group-item {
+    border: none;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.software-suggestions .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.software-suggestions .list-group-item:last-child {
+    border-bottom: none;
+}
+</style>
+{% endblock %} 
